@@ -90,10 +90,10 @@ def load_dataset(data_in={"tfrecord_files":'/tfrecord/dataset_0000.tfrecord',"pa
         # Adjust shape based on how data was flattened
         # ---------------------------------------------------------------------------------------------------------------
         feature_description = {'feature': tf.io.FixedLenFeature([shpy*(shpz+2*padding)*(shpx+2*padding)*3],dtype),
-                               'label': tf.io.FixedLenFeature([shpy*shpz*shpx*3],dtype)}
+                               'label': tf.io.FixedLenFeature([shpy*shpz*shpx*1],dtype)}
         parsed_features     = tf.io.parse_single_example(proto,feature_description)
         feature             = tf.reshape(parsed_features['feature'],[shpy,shpz+2*padding,shpx+2*padding,3])
-        label               = tf.reshape(parsed_features['label'],[shpy,shpz,shpx,3])
+        label               = tf.reshape(parsed_features['label'],[shpy,shpz,shpx,1])
         return feature,label
     
             
@@ -190,10 +190,10 @@ def read_tfrecord(data_in={"tfrecord_folder":'/tfrecord/',"interval":[],"test_si
         # Adjust shape based on how data was flattened
         # ---------------------------------------------------------------------------------------------------------------
         feature_description = {'feature': tf.io.FixedLenFeature([shpy*(shpz+2*padding)*(shpx+2*padding)*3],dtype),
-                               'label': tf.io.FixedLenFeature([shpy*shpz*shpx*3],dtype)}
+                               'label': tf.io.FixedLenFeature([shpy*shpz*shpx*1],dtype)}
         parsed_features     = tf.io.parse_single_example(proto,feature_description)
         feature             = tf.reshape(parsed_features['feature'],[shpy,shpz+2*padding,shpx+2*padding,3])
-        label               = tf.reshape(parsed_features['label'],[shpy,shpz,shpx,3])
+        label               = tf.reshape(parsed_features['label'],[shpy,shpz,shpx,1])
         return feature,label
     
     # -------------------------------------------------------------------------------------------------------------------
