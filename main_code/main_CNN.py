@@ -48,7 +48,7 @@ lines:
 # - folders    : file containing the folder and file structures
 # - tr_data    : file containing the data of the training
 # ----------------------------------------------------------------------------------------------------------------------
-folder_def  = "d20240603_definitions"
+folder_def  = "P125_83pi_turbulentbudget"
 chd_str     = "channel_data"
 folders_str = "folders"
 tr_data_str = "training_data"
@@ -110,11 +110,14 @@ padding = chd.padding
 # ----------------------------------------------------------------------------------------------------------------------
 uvw_folder          = folders.uvw_folder
 uvw_file            = folders.uvw_file
+tb_folder           = folders.tb_folder
+tb_file             = folders.tb_file
 data_folder         = folders.data_folder
 umean_file          = folders.umean_file
 unorm_file          = folders.unorm_file
+tb_norm_file        = folders.tb_norm_file
 uvw_folderii_tf     = folders.uvw_folderii_tf
-ssh_flag_train      = bool(folders.ssh_flag_train)
+ssh_flag_train      = folders.ssh_flag_train
 if ssh_flag_train:
     uvw_folder_tf   = folders.uvw_folder_tf_ssh
     uvw_folder_temp = folders.uvw_folder_temp
@@ -127,6 +130,7 @@ else:
     ssh_server      = '-'
     ssh_username    = '-'
     ssh_password    = '-'
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Define the data for the training.
@@ -205,10 +209,10 @@ traintest_index = folders.traintest_index
 # ----------------------------------------------------------------------------------------------------------------------
 # Define dict containing the information needed for the deep model definition and call the deep learning model
 # ----------------------------------------------------------------------------------------------------------------------
-DL_data  = {"uvw_folder":uvw_folder,"uvw_file":uvw_file,"padding":padding,
+DL_data  = {"uvw_folder":uvw_folder,"uvw_file":uvw_file,"tb_folder":tb_folder,"tb_file":tb_file,"padding":padding,
             "dx":dx,"dy":dy,"dz":dz,"data_folder":data_folder,"umean_file":umean_file,"unorm_file":unorm_file,
-            "L_x":L_x,"L_z":L_z,"L_y":L_y,"uvw_folder_tf":uvw_folder_tf,"uvw_folderii_tf":uvw_folderii_tf,
-            "rey":rey,"utau":utau,"ssh_flag_train":ssh_flag_train,
+            "tb_norm_file":tb_norm_file,"L_x":L_x,"L_z":L_z,"L_y":L_y,"uvw_folder_tf":uvw_folder_tf,
+            "uvw_folderii_tf":uvw_folderii_tf,"rey":rey,"utau":utau,"ssh_flag_train":ssh_flag_train,
             "uvw_folder_temp":folders.uvw_folder_temp,"ssh_server":folders.ssh_server,
             "ssh_username":folders.ssh_username,"ssh_password":folders.ssh_password,"error_file":error_file,
             "umax_file":umax_file,"urmspred_file":urmspred_file}

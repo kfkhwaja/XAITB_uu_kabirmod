@@ -681,7 +681,7 @@ class deep_model():
                                       "shpx":self.shpx,"shpy":self.shpy,"shpz":self.shpz,
                                       "dx":self.dx,"dy":self.dy,"dz":self.dz,"data_folder":self.data_folder,
                                       "umean_file":self.umean_file,"unorm_file":self.unorm_file,
-                                      "mean_norm":self.mean_norm,"data_type":data_type}
+                                      "mean_norm":self.mean_norm,"data_type":self.data_type}
                     data_base_mem  = read_inout_notprepared(data_in=data_trainval)
                     data_tensor    = {"data_X":data_base_mem["data_X"],"data_Y":data_base_mem["data_Y"],
                                       "interval":None,"test_size":self.test_size,"shpx":self.shpx,"shpy":self.shpy,
@@ -1394,10 +1394,10 @@ class deep_model():
                       "dtype":None}
         x12_d      = block(data_in=data_x12_d)["output"]
         if self.mean_norm:
-            data_x13_d = {"input":x12_d,"nfil":3,"stride":self.stride,"activ":"tanh","kernel":self.kernel,
+            data_x13_d = {"input":x12_d,"nfil":1,"stride":self.stride,"activ":"tanh","kernel":self.kernel,
                           "dtype":self.data_type}
         else:
-            data_x13_d = {"input":x12_d,"nfil":3,"stride":self.stride,"activ":"sigmoid","kernel":self.kernel,
+            data_x13_d = {"input":x12_d,"nfil":1,"stride":self.stride,"activ":"sigmoid","kernel":self.kernel,
                           "dtype":self.data_type}
         x13_d      = block(data_in=data_x13_d)["output"]
         
