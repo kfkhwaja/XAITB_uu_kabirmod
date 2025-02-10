@@ -70,9 +70,9 @@ Folder structure for the problem: folders and files for the flow fields, structu
 #     - tb_folder  : Folder of the turbulent budget data
 #     - tb_file    : This file does not contain the file index
 # ----------------------------------------------------------------------------------------------------------------------
-uvw_folder = '/data1/P125/phys/'
+uvw_folder = '../../P125_83pi/'
 uvw_file   = 'P125_83pi.$INDEX$.h5.uvw'
-tb_folder  = '/poiseuille/P125_83/cor'
+tb_folder  = '../../P125_83pi_tb_uu/'
 tb_file    = 'P125_83tb.$INDEX$.h5.itb'
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ tb_file    = 'P125_83tb.$INDEX$.h5.itb'
 # ----------------------------------------------------------------------------------------------------------------------
 uvw_folder_tf     = "-"
 uvw_folderii_tf   = '-'
-tfrecord_folder   = '/poiseuille/P125_83/tfrecord_tb_uu/'
+tfrecord_folder   = '../../tfrecord_tb_uu/'
 uvw_folder_tf_ssh = uvw_folder_tf
 uvw_folder_temp   = "-"
 ssh_flag_train    = False
@@ -117,7 +117,7 @@ ssh_password      = "-"
 #     - file_repetition     : File with data of the repetitions
 #     - file_snr            : File with data of the SNR
 # ----------------------------------------------------------------------------------------------------------------------
-data_folder         = "/poiseuille/P125_83/P125_83pi_data/d20250210_Data_tb_uu"
+data_folder         = "../../P125_83pi_data/d20250129_Data_tb_uu"
 umean_file          = "Umean.txt"
 unorm_file          = "norm.txt"
 tb_norm_file        = "tb_norm.txt"
@@ -140,14 +140,14 @@ file_snr            = "repetitions_shap_snr.txt"
 #     - model_write  : Name of the model
 #     - model_read   : Name of a model to load
 # ----------------------------------------------------------------------------------------------------------------------
-model_folder = "/poiseuille/P125_83/P125_83pi_data/d20250210_models_tb_uu"
+model_folder = "../../P125_83pi_data/d20250129_models_tb_uu"
 model_write  = "trained_model_tb_0001.h5"
 model_read   = "trained_model_tb_0001.h5"
 # ----------------------------------------------------------------------------------------------------------------------
 # Data for the plots:
 #     - plot_folder : folder to store the plots
 # ----------------------------------------------------------------------------------------------------------------------
-plot_folder = "/poiseuille/P125_83/P125_83pi_data/d20250210_plots_tb_uu"
+plot_folder = "../../P125_83pi_data/d20250129_plots_tb_uu"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Data for the uv structures
@@ -184,7 +184,7 @@ SHAPq_uvw_file   = "-"
 #     - shapseg_vortices_folder : folder to store the shap values for segmented domains using vortices
 #     - shapseg_vortices_file   : file to store the shap values for segmented domains using vortices
 # ----------------------------------------------------------------------------------------------------------------------
-shap_folder           = "/poiseuille/P125_83/SHAP_d20250210_tb_uu"
+shap_folder           = "../../SHAP_d20250129_tb_uu"
 shap_file             = "P125_83pi_nsample$NSAMPLES$.$INDEX$.h5.shap"
 shapseg_uv_folder     = "-"
 shapseg_uv_file       = "-"
