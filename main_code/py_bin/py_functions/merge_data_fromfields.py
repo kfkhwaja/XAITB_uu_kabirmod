@@ -24,10 +24,11 @@ import os
 import numpy as np
 from tqdm import tqdm
 
-def create_datasets(data_in={"folder":"../../P125_21pi_vu/","file":'P125_21pi_vu.1000.h5.uvw',"elem_spec":[],
+def create_datasets(data_in={"folder_uvw":"../../P125_21pi_vu/","file_uvw":'P125_21pi_vu.1000.h5.uvw',
+                             "folder_tb":"../../P125_21pi_vu/","file_tb":'P125_21pi_vu.1000.h5.uvw',"elem_spec":[],
                              "padding":15,"shpx":1,"shpy":1,"shpz":1,"dx":1,"dy":1,"dz":1,"data_folder":"Data",
-                             "umean_file":"umean.txt","unorm_file":"norm.txt","data_type":"float32","mean_norm":False,
-                             "index":1000,"delta_pred":1}):
+                             "umean_file":"umean.txt","unorm_file":"norm.txt","tb_norm_file":"norm.txt",
+                             "data_type":"float32","mean_norm":False,"index":1000,"delta_pred":1}):
     """
     .....................................................................................................................
     # create_datasets: Function for reading the data
@@ -36,31 +37,35 @@ def create_datasets(data_in={"folder":"../../P125_21pi_vu/","file":'P125_21pi_vu
     ----------
     data_in : dict, optional
         data required for selecting the fields for the training process.
-        The default is {"folder":"../../P125_21pi_vu/","file":'P125_21pi_vu.1000.h5.uvw',"elem_spec":[],
+        The default is {"folder_uvw":"../../P125_21pi_vu/","file_uvw":'P125_21pi_vu.1000.h5.uvw',
+                        "folder_tb":"../../P125_21pi_vu/","file_tb":'P125_21pi_vu.1000.h5.uvw',"elem_spec":[],
                         "padding":15,"shpx":1,"shpy":1,"shpz":1,"dx":1,"dy":1,"dz":1,"data_folder":"Data",
-                        "umean_file":"umean.txt","unorm_file":"norm.txt","data_type":"float32","mean_norm":False,
-                        "index":1000,"delta_pred":1}.
+                        "umean_file":"umean.txt","unorm_file":"norm.txt","tb_norm_file":"norm.txt",
+                        "data_type":"float32","mean_norm":False,"index":1000,"delta_pred":1}.
         Data:
-            - folder      : path to the folder to read the fields
-            - file        : path to the file to read the fields
-            - elem_spec   : specification of the format of the elements
-            - version_tf  : version of the tensorflow
-            - padding     : padding applied to the fields
-            - shpx        : shape in the streamwise direction
-            - shpy        : shape in the wall-normal direction
-            - shpz        : shape in the spanwise direction
-            - dx          : downsampling in the streamwise direction
-            - dy          : downsampling in the wall-normal direction
-            - dz          : downsampling in the spanwise direction
-            - data_folder : folder to store the data of the model
-            - umean_file  : file storing the mean velocity
-            - unorm_file  : file storing the normalization
-            - data_type   : type of data used (float32,float16)
-            - mean_norm   : flag for choosing between standarization and normalization (True: standarization with
-                                                                                        mean and standard deviation,
-                                                                                        False: normalization 
-                                                                                        between minimum and maximum)
-            - delta_pred  : number of fields to advance in the predictions
+            - folder_uvw   : path to the folder to read the velocity fields
+            - file_uvw     : path to the file to read the velocity fields
+            - folder_tb    : path to the folder to read the turbulent budget fields
+            - file_tb      : path to the file to read the turbulent budget fields
+            - elem_spec    : specification of the format of the elements
+            - version_tf   : version of the tensorflow
+            - padding      : padding applied to the fields
+            - shpx         : shape in the streamwise direction
+            - shpy         : shape in the wall-normal direction
+            - shpz         : shape in the spanwise direction
+            - dx           : downsampling in the streamwise direction
+            - dy           : downsampling in the wall-normal direction
+            - dz           : downsampling in the spanwise direction
+            - data_folder  : folder to store the data of the model
+            - umean_file   : file storing the mean velocity
+            - unorm_file   : file storing the normalization
+            - tb_norm_file : file storing the turbulent budget normalization
+            - data_type    : type of data used (float32,float16)
+            - mean_norm    : flag for choosing between standarization and normalization (True: standarization with
+                                                                                         mean and standard deviation,
+                                                                                         False: normalization 
+                                                                                         between minimum and maximum)
+            - delta_pred   : number of fields to advance in the predictions
     
     Returns
     -------
@@ -73,35 +78,39 @@ def create_datasets(data_in={"folder":"../../P125_21pi_vu/","file":'P125_21pi_vu
     # Import modules
     # -------------------------------------------------------------------------------------------------------------------
     from py_bin.py_functions.read_norm_velocity import read_norm_velocity
+    from py_bin.py_functions.read_norm_tb import read_norm_tb
     
     # -------------------------------------------------------------------------------------------------------------------
     # Read data
     # -------------------------------------------------------------------------------------------------------------------
-    file        = str(data_in["file"])
-    folder      = str(data_in["folder"])
-    elem_spec   = data_in["elem_spec"]
-    shpx        = int(data_in["shpx"])
-    shpy        = int(data_in["shpy"])
-    shpz        = int(data_in["shpz"])
-    dx          = int(data_in["dx"])
-    dy          = int(data_in["dy"])
-    dz          = int(data_in["dz"])
-    padding     = int(data_in["padding"])
-    data_folder = str(data_in["data_folder"])
-    umean_file  = str(data_in["umean_file"])
-    unorm_file  = str(data_in["unorm_file"])
-    mean_norm   = bool(data_in["mean_norm"])
-    index       = int(data_in["index"])
-    delta_pred  = int(data_in["delta_pred"])
-    data_type   = str(data_in["data_type"])
-    version_tf  = np.array(tf.__version__.split('.'),dtype="int")
-    data_X      = np.zeros((1,shpy,shpz+2*padding,shpx+2*padding,3),dtype=data_type)
-    data_Y      = np.zeros((1,shpy,shpz,shpx,3),dtype=data_type)
+    file_uvw     = str(data_in["file_uvw"])
+    folder_uvw   = str(data_in["folder_uvw"])
+    file_tb      = str(data_in["file_tb"])
+    folder_tb    = str(data_in["folder_tb"])
+    elem_spec    = data_in["elem_spec"]
+    shpx         = int(data_in["shpx"])
+    shpy         = int(data_in["shpy"])
+    shpz         = int(data_in["shpz"])
+    dx           = int(data_in["dx"])
+    dy           = int(data_in["dy"])
+    dz           = int(data_in["dz"])
+    padding      = int(data_in["padding"])
+    data_folder  = str(data_in["data_folder"])
+    umean_file   = str(data_in["umean_file"])
+    unorm_file   = str(data_in["unorm_file"])
+    tb_norm_file = str(data_in["tb_norm_file"])
+    mean_norm    = bool(data_in["mean_norm"])
+    index        = int(data_in["index"])
+    delta_pred   = int(data_in["delta_pred"])
+    data_type    = str(data_in["data_type"])
+    version_tf   = np.array(tf.__version__.split('.'),dtype="int")
+    data_X       = np.zeros((1,shpy,shpz+2*padding,shpx+2*padding,3),dtype=data_type)
+    data_Y       = np.zeros((1,shpy,shpz,shpx,1),dtype=data_type)
     
     # ---------------------------------------------------------------------------------------------------------------
     # Read the input field
     # ---------------------------------------------------------------------------------------------------------------
-    data_norm_X     = {"folder":folder,"file":file,"padding":padding,"shpx":shpx,
+    data_norm_X     = {"folder":folder_uvw,"file":file_uvw,"padding":padding,"shpx":shpx,
                        "shpy":shpy,"shpz":shpz,"dx":dx,"dy":dy,"dz":dz,"data_folder":data_folder,
                        "umean_file":umean_file,"unorm_file":unorm_file,"index":index,"data_type":data_type,
                        "mean_norm":mean_norm}
@@ -114,15 +123,15 @@ def create_datasets(data_in={"folder":"../../P125_21pi_vu/","file":'P125_21pi_vu
     # ---------------------------------------------------------------------------------------------------------------
     # Read the output field
     # ---------------------------------------------------------------------------------------------------------------
-    data_norm_Y     = {"folder":folder,"file":file,"padding":0,"shpx":shpx,
-                       "shpy":shpy,"shpz":shpz,"dx":dx,"dy":dy,"dz":dz,"data_folder":data_folder,
-                       "umean_file":umean_file,"unorm_file":unorm_file,"index":index+delta_pred,
-                       "data_type":data_type,"mean_norm":mean_norm}
-    data_veloc_norm = read_norm_velocity(data_in=data_norm_Y)
-    norm_velocity_Y = data_veloc_norm["norm_velocity"]
-    print("Time for reading the field: "+str(data_veloc_norm["time_read"]),flush=True)
-    print("Time for normalizing the field: "+str(data_veloc_norm["time_norm"]),flush=True)
-    del data_norm_Y,data_veloc_norm
+    data_norm_Y  = {"folder":folder_tb,"file":file_tb,"padding":0,"shpx":shpx,
+                    "shpy":shpy,"shpz":shpz,"dx":dx,"dy":dy,"dz":dz,"data_folder":data_folder,
+                    "norm_file":tb_norm_file,"index":index+delta_pred,
+                    "data_type":data_type,"mean_norm":mean_norm}
+    data_tb_norm = read_norm_tb(data_in=data_norm_Y)
+    norm_tb_Y    = data_tb_norm["norm_tb"]
+    print("Time for reading the field: "+str(data_tb_norm["time_read"]),flush=True)
+    print("Time for normalizing the field: "+str(data_tb_norm["time_norm"]),flush=True)
+    del data_norm_Y,data_tb_norm
     print("-"*100,flush=True)
     
     # ---------------------------------------------------------------------------------------------------------------
@@ -132,10 +141,8 @@ def create_datasets(data_in={"folder":"../../P125_21pi_vu/","file":'P125_21pi_vu
     data_X[0,:,:,:,1] = norm_velocity_X['vnorm']
     data_X[0,:,:,:,2] = norm_velocity_X['wnorm']
     del norm_velocity_X
-    data_Y[0,:,:,:,0] = norm_velocity_Y['unorm']
-    data_Y[0,:,:,:,1] = norm_velocity_Y['vnorm']
-    data_Y[0,:,:,:,2] = norm_velocity_Y['wnorm']
-    del norm_velocity_Y
+    data_Y[0,:,:,:,0] = norm_tb_Y['prod_uunorm']
+    del norm_tb_Y
     print("-"*100,flush=True)
     
     data_XY = tf.data.Dataset.from_tensor_slices((data_X,data_Y))
@@ -210,10 +217,13 @@ def write_tfrecord(data_in={"output_path":'/tfrecord/merged_vali_data/dataset_00
             writer.write(example)
     
 
-def create_tfrecords(data_in={"output_directory":'/tfrecord/',"base_directory":"../../P125_21pi_vu_tf_float32/",
-                              "base_file":"P125_21pi_vu.$INDEX$.h5.uvw","datasets":[],"elem_spec":[],"shpx":1,
+def create_tfrecords(data_in={"output_directory":'/tfrecord/',"base_directory_uvw":"../../P125_21pi_vu_tf_float32/",
+                              "base_file_uvw":"P125_21pi_vu.$INDEX$.h5.uvw",
+                              "base_directory_tb":"../../P125_21pi_vu_tf_float32/",
+                              "base_file_tb":"P125_21pi_vu.$INDEX$.h5.uvw","datasets":[],"elem_spec":[],"shpx":1,
                               "shpy":1,"shpz":1,"dx":1,"dy":1,"dz":1,"padding":15,"data_type":"float32",
-                              "data_folder":"Data","umean_file":"umean.txt","unorm_file":"norm.txt","mean_norm":False,
+                              "data_folder":"Data","umean_file":"umean.txt","unorm_file":"norm.txt",
+                              "tb_norm_file":"norm.txt","mean_norm":False,
                               "delta_pred":1}):
     """
     ---------------------------------------------------------------------------------------------------------------------
@@ -222,33 +232,39 @@ def create_tfrecords(data_in={"output_directory":'/tfrecord/',"base_directory":"
     Parameters
     ----------
     data_in : TYPE, optional
-        DESCRIPTION. The default is {"output_directory":'/tfrecord/',"base_directory":"../../P125_21pi_vu_tf_float32/",
-                                     "base_file":"P125_21pi_vu.$INDEX$.h5.uvw","datasets":[],"elem_spec":[],"shpx":1,
+        DESCRIPTION. The default is {"output_directory":'/tfrecord/',"base_directory_uvw":"../../P125_21pi_vu_tf_float32/",
+                                     "base_file_uvw":"P125_21pi_vu.$INDEX$.h5.uvw",
+                                     "base_directory_tb":"../../P125_21pi_vu_tf_float32/",
+                                     "base_file_tb":"P125_21pi_vu.$INDEX$.h5.uvw","datasets":[],"elem_spec":[],"shpx":1,
                                      "shpy":1,"shpz":1,"dx":1,"dy":1,"dz":1,"padding":15,"data_type":"float32",
                                      "data_folder":"Data","umean_file":"umean.txt","unorm_file":"norm.txt",
-                                     "mean_norm":False,"delta_pred":1}.
+                                     "tb_norm_file":"norm.txt","mean_norm":False,
+                                     "delta_pred":1}.
         Data:
-            - output_directory : directory to store the tfrecord files
-            - base_directory   : directory of the files to store in the output directory
-            - base_file        : name of the files stored in the base_directory
-            - datasets         : indices of the fields to read
-            - elem_spec        : specification of the elements of the dataset
-            - shpx             : shape in the streamwise direction
-            - shpy             : shape in the wall-normal direction
-            - shpz             : shape in the spanwise direction
-            - dx               : downsampling in the streamwise direction
-            - dy               : downsampling in the wall-normal direction
-            - dz               : downsampling in the spanwise direction
-            - padding          : padding applied to the fields
-            - data_type        : type of data used (float32,float16)
-            - data_folder      : folder to store the data of the model
-            - umean_file       : file storing the mean velocity
-            - unorm_file       : file storing the normalization
-            - mean_norm        : flag for choosing between standarization and normalization (True: standarization with
-                                                                                             mean and standard deviation,
-                                                                                             False: normalization 
-                                                                                             between minimum and maximum)
-            - delta_pred       : number of fields to advance in the predictions
+            - output_directory   : directory to store the tfrecord files
+            - base_directory_uvw : directory of the files to store in the output directory
+            - base_file_uvw      : name of the files stored in the base_directory
+            - base_directory_tb  : folder in which the turbulent budget data is stored
+            - base_file_tb       : folder in which the turbulent budget data is stored
+            - datasets           : indices of the fields to read
+            - elem_spec          : specification of the elements of the dataset
+            - shpx               : shape in the streamwise direction
+            - shpy               : shape in the wall-normal direction
+            - shpz               : shape in the spanwise direction
+            - dx                 : downsampling in the streamwise direction
+            - dy                 : downsampling in the wall-normal direction
+            - dz                 : downsampling in the spanwise direction
+            - padding            : padding applied to the fields
+            - data_type          : type of data used (float32,float16)
+            - data_folder        : folder to store the data of the model
+            - umean_file         : file storing the mean velocity
+            - unorm_file         : file storing the normalization
+            - tb_norm_file       : file containing the normalization of the turbulent budget
+            - mean_norm          : flag for choosing between standarization and normalization (True: standarization with
+                                                                                               mean and standard deviation,
+                                                                                               False: normalization 
+                                                                                               between minimum and maximum)
+            - delta_pred         : number of fields to advance in the predictions
 
     Returns
     -------
@@ -258,25 +274,28 @@ def create_tfrecords(data_in={"output_directory":'/tfrecord/',"base_directory":"
     # -------------------------------------------------------------------------------------------------------------------
     # Read data
     # -------------------------------------------------------------------------------------------------------------------
-    output_directory = str(data_in["output_directory"])
-    base_directory   = str(data_in["base_directory"])
-    base_file        = str(data_in["base_file"])
-    datasets         = np.array(data_in["datasets"],dtype="int")
-    elem_spec        = data_in["elem_spec"]
-    shpx             = int(data_in["shpx"])
-    shpy             = int(data_in["shpy"])
-    shpz             = int(data_in["shpz"])
-    dx               = int(data_in["dx"])
-    dy               = int(data_in["dy"])
-    dz               = int(data_in["dz"])
-    padding          = int(data_in["padding"])
-    data_folder      = str(data_in["data_folder"])
-    umean_file       = str(data_in["umean_file"])
-    unorm_file       = str(data_in["unorm_file"])
-    mean_norm        = bool(data_in["mean_norm"])
-    delta_pred       = int(data_in["delta_pred"])
-    data_type        = str(data_in["data_type"])
-    num_datasets     = len(datasets)
+    output_directory   = str(data_in["output_directory"])
+    base_directory_uvw = str(data_in["base_directory_uvw"])
+    base_file_uvw      = str(data_in["base_file_uvw"])
+    base_directory_tb  = str(data_in["base_directory_tb"])
+    base_file_tb       = str(data_in["base_file_tb"])
+    datasets           = np.array(data_in["datasets"],dtype="int")
+    elem_spec          = data_in["elem_spec"]
+    shpx               = int(data_in["shpx"])
+    shpy               = int(data_in["shpy"])
+    shpz               = int(data_in["shpz"])
+    dx                 = int(data_in["dx"])
+    dy                 = int(data_in["dy"])
+    dz                 = int(data_in["dz"])
+    padding            = int(data_in["padding"])
+    data_folder        = str(data_in["data_folder"])
+    umean_file         = str(data_in["umean_file"])
+    unorm_file         = str(data_in["unorm_file"])
+    tb_norm_file       = str(data_in["tb_norm_file"])
+    mean_norm          = bool(data_in["mean_norm"])
+    delta_pred         = int(data_in["delta_pred"])
+    data_type          = str(data_in["data_type"])
+    num_datasets       = len(datasets)
     
     # -------------------------------------------------------------------------------------------------------------------
     # Create output directory if it does not exist
@@ -292,9 +311,12 @@ def create_tfrecords(data_in={"output_directory":'/tfrecord/',"base_directory":"
         # Create the data to load to the tfrecords
         # ---------------------------------------------------------------------------------------------------------------
         index       = int(datasets[idx])
-        dataset_in  = {"folder":base_directory,"file":base_file,"elem_spec":elem_spec,"shpx":shpx,"shpy":shpy,
+        dataset_in  = {"folder_uvw":base_directory_uvw,"file_uvw":base_file_uvw,
+                       "folder_tb":base_directory_tb,"file_tb":base_file_tb,
+                       "elem_spec":elem_spec,"shpx":shpx,"shpy":shpy,
                        "shpz":shpz,"dx":dx,"dy":dy,"dz":dz,"padding":padding,"data_type":data_type,
-                       "data_folder":data_folder,"umean_file":umean_file,"unorm_file":unorm_file,"mean_norm":mean_norm,
+                       "data_folder":data_folder,"umean_file":umean_file,"unorm_file":unorm_file,
+                       "tb_norm_file":tb_norm_file,"mean_norm":mean_norm,
                        "index":index,"delta_pred":delta_pred}
         dataset     = create_datasets(dataset_in)["data_XY"]
         # ---------------------------------------------------------------------------------------------------------------
@@ -306,10 +328,14 @@ def create_tfrecords(data_in={"output_directory":'/tfrecord/',"base_directory":"
         print(f"Dataset {idx} written to {output_path}",flush=True)
     
 
-def merge_data(data_in={"base_directory":"../../P125_21pi_vu_tf_float32/","base_file":"P125_21pi_vu.$INDEX$.h5.uvw",
+def merge_data(data_in={"base_directory_uvw":"../../P125_21pi_vu_tf_float32/",
+                        "base_file_uvw":"P125_21pi_vu.$INDEX$.h5.uvw",
+                        "base_directory_tb":"../../P125_21pi_vu_tf_float32/",
+                        "base_file_tb":"P125_21pi_vu.$INDEX$.h5.uvw",
                         "padding":15,"shpx":1,"shpy":1,"shpz":1,"dx":1,"dy":1,"dz":1,"data_type":"float32",
                         "datasets":[],"output_path":'/tfrecord/merged_vali_data/',"data_folder":"Data",
-                        "umean_file":"umean.txt","unorm_file":"norm.txt","mean_norm":False,"delta_pred":1}):
+                        "umean_file":"umean.txt","unorm_file":"norm.txt","tb_norm_file":"tb_norm.txt",
+                        "mean_norm":False,"delta_pred":1}):
     """
     .....................................................................................................................
     # merge_data: Function for reading the training and validation data in the tensorflow format for proper usage of 
@@ -319,29 +345,38 @@ def merge_data(data_in={"base_directory":"../../P125_21pi_vu_tf_float32/","base_
     ----------
     data_in : dict, optional
         data required for selecting the fields for the training process.
-        The default is {"base_directory":"../../P125_21pi_vu_tf_float32/","base_file":"P125_21pi_vu.$INDEX$.h5.uvw",
+        The default is {"base_directory_uvw":"../../P125_21pi_vu_tf_float32/",
+                        "base_file_uvw":"P125_21pi_vu.$INDEX$.h5.uvw",
+                        "base_directory_tb":"../../P125_21pi_vu_tf_float32/",
+                        "base_file_tb":"P125_21pi_vu.$INDEX$.h5.uvw",
                         "padding":15,"shpx":1,"shpy":1,"shpz":1,"dx":1,"dy":1,"dz":1,"data_type":"float32",
                         "datasets":[],"output_path":'/tfrecord/merged_vali_data/',"data_folder":"Data",
-                        "umean_file":"umean.txt","unorm_file":"norm.txt","mean_norm":False,"delta_pred":1}.
+                        "umean_file":"umean.txt","unorm_file":"norm.txt","tb_norm_file":"tb_norm.txt",
+                        "mean_norm":False,"delta_pred":1}.
         Data:
-            - base_directory : folder in which the data is stored
-            - padding        : padding of the fields
-            - shpx           : shape in the streamwise direction
-            - shpy           : shape in the wall-normal direction
-            - shpz           : shape in the spanwise direction
-            - dx             : downsampling in the streamwise direction
-            - dy             : downsampling in the wall-normal direction
-            - dz             : downsampling in the spanwise direction
-            - data_type      : type of data of the folder
-            - datasets       : number of fields to read
-            - output_path    : path to store the file
-            - data_folder    : folder to store the data generated in the code
-            - umean_file     : file containing the mean velocity
-            - unorm_file     : file containing the normalization
-            - mean_norm      : flag for defining the type of normalization (True: standarize with mean and standard
-                                                                            deviation, False: normalize between 
-                                                                            minimum and maximum)
-            - delta_pred     : number of files to advance the predictions
+            - base_directory_uvw : folder in which the velocity data is stored
+            - base_file_uvw      : folder in which the velocity data is stored
+            - base_directory_tb  : folder in which the turbulent budget data is stored
+            - base_file_tb       : folder in which the turbulent budget data is stored
+            - padding            : padding of the fields
+            - shpx               : shape in the streamwise direction
+            - shpy               : shape in the wall-normal direction
+            - shpz               : shape in the spanwise direction
+            - dx                 : downsampling in the streamwise direction
+            - dy                 : downsampling in the wall-normal direction
+            - dz                 : downsampling in the spanwise direction
+            - data_type          : type of data of the folder
+            - datasets           : number of fields to read
+            - output_path        : path to store the file
+            - data_folder        : folder to store the data generated in the code
+            - umean_file         : file containing the mean velocity
+            - unorm_file         : file containing the normalization of the velocity
+            - tb_norm_file       : file containing the normalization of the turbulent budget
+            - mean_norm          : flag for defining the type of normalization (True: standarize with mean 
+                                                                                and standard deviation, 
+                                                                                False: normalize between 
+                                                                                minimum and maximum)
+            - delta_pred         : number of files to advance the predictions
   
     Returns
     -------
@@ -350,23 +385,26 @@ def merge_data(data_in={"base_directory":"../../P125_21pi_vu_tf_float32/","base_
     # -------------------------------------------------------------------------------------------------------------------
     # Read the data
     # -------------------------------------------------------------------------------------------------------------------
-    base_directory = str(data_in["base_directory"])
-    base_file      = str(data_in["base_file"])
-    padding        = int(data_in["padding"])
-    shpx           = int(data_in["shpx"])
-    shpy           = int(data_in["shpy"])
-    shpz           = int(data_in["shpz"])
-    dx             = int(data_in["dx"])
-    dy             = int(data_in["dy"])
-    dz             = int(data_in["dz"])
-    data_type      = str(data_in["data_type"])
-    datasets       = np.array(data_in["datasets"],dtype='int')
-    output_path    = str(data_in["output_path"])
-    data_folder    = str(data_in["data_folder"])
-    umean_file     = str(data_in["umean_file"])
-    unorm_file     = str(data_in["unorm_file"])
-    mean_norm      = bool(data_in["mean_norm"])
-    delta_pred     = int(data_in["delta_pred"])
+    base_directory_uvw = str(data_in["base_directory_uvw"])
+    base_file_uvw      = str(data_in["base_file_uvw"])
+    base_directory_tb  = str(data_in["base_directory_tb"])
+    base_file_tb       = str(data_in["base_file_tb"])
+    padding            = int(data_in["padding"])
+    shpx               = int(data_in["shpx"])
+    shpy               = int(data_in["shpy"])
+    shpz               = int(data_in["shpz"])
+    dx                 = int(data_in["dx"])
+    dy                 = int(data_in["dy"])
+    dz                 = int(data_in["dz"])
+    data_type          = str(data_in["data_type"])
+    datasets           = np.array(data_in["datasets"],dtype='int')
+    output_path        = str(data_in["output_path"])
+    data_folder        = str(data_in["data_folder"])
+    umean_file         = str(data_in["umean_file"])
+    unorm_file         = str(data_in["unorm_file"])
+    tb_norm_file       = str(data_in["tb_norm_file"])
+    mean_norm          = bool(data_in["mean_norm"])
+    delta_pred         = int(data_in["delta_pred"])
     if data_type == "float32":
         dtype = tf.float32
     elif data_type == "float16":
@@ -379,14 +417,15 @@ def merge_data(data_in={"base_directory":"../../P125_21pi_vu_tf_float32/","base_
     # Define your element spec here based on the data structure
     # -------------------------------------------------------------------------------------------------------------------
     elem_spec = (tf.TensorSpec(shape=(shpy,shpz+2*padding,shpx+2*padding,3),dtype=dtype),
-                 tf.TensorSpec(shape=(shpy,shpz,shpx,3),dtype=dtype))
+                 tf.TensorSpec(shape=(shpy,shpz,shpx,1),dtype=dtype))
     
     # -------------------------------------------------------------------------------------------------------------------
     # Create the tfrecords
     # -------------------------------------------------------------------------------------------------------------------
-    data_tfrecords = {"output_directory":output_path,"base_directory":base_directory,"base_file":base_file,
+    data_tfrecords = {"output_directory":output_path,"base_directory_uvw":base_directory_uvw,
+                      "base_file_uvw":base_file_uvw,"base_directory_tb":base_directory_tb,"base_file_tb":base_file_tb,
                       "datasets":datasets,"elem_spec":elem_spec,"shpx":shpx,"shpy":shpy,"shpz":shpz,"dx":dx,"dy":dy,
                       "dz":dz,"padding":padding,"data_type":data_type,"data_folder":data_folder,"umean_file":umean_file,
-                      "unorm_file":unorm_file,"mean_norm":mean_norm,"delta_pred":delta_pred}
+                      "unorm_file":unorm_file,"tb_norm_file":tb_norm_file,"mean_norm":mean_norm,"delta_pred":delta_pred}
     create_tfrecords(data_in=data_tfrecords)
 

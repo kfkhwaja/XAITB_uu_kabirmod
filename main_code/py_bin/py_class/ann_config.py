@@ -112,9 +112,10 @@ class deep_model():
     .....................................................................................................................
     """
     def __init__(self,data_in = {"uvw_folder":"../../P125_21pi_vu/",
-                                 "uvw_file":"P125_21pi_vu.$INDEX$.h5.uvw","padding":15,
+                                 "uvw_file":"P125_21pi_vu.$INDEX$.h5.uvw","tb_folder":"../../P125_21pi_vu_tb/",
+                                 "tb_file":"P125_21pi_vu.$INDEX$.h5.uvw","padding":15,
                                  "dx":1,"dy":1,"dz":1,"data_folder":"data","umean_file":"Umean.txt",
-                                 "unorm_file":"Unorm.txt","L_x":2*np.pi,"L_z":np.pi,"L_y":1,
+                                 "unorm_file":"Unorm.txt","tb_norm_file":"tb_norm.txt","L_x":2*np.pi,"L_z":np.pi,"L_y":1,
                                  "uvw_folder_tf":"../../P125_21pi_vu_tf","uvw_folderii_tf":"P125_21pi_vu.$INDEX$",
                                  "rey":125,"utau":0.060523258443963,"ssh_flag_train":False,
                                  "uvw_folder_temp":"-","ssh_server":"-","ssh_username":"-","ssh_password":"-",
@@ -128,10 +129,11 @@ class deep_model():
         ----------
         data_in : dict, dictionary containing all the information required for the neural network
             DESCRIPTION. The default is {"uvw_folder":"../P125_21pi_vu/",
-                                         "uvw_file":"P125_21pi_vu.$INDEX$.h5.uvw","padding":15,
+                                         "uvw_file":"P125_21pi_vu.$INDEX$.h5.uvw","tb_folder":"../../P125_21pi_vu_tb/",
+                                         "tb_file":"P125_21pi_vu.$INDEX$.h5.uvw","padding":15,
                                          "dx":1,"dy":1,"dz":1,"data_folder":"data","umeanfile":"Umean.txt"
-                                         "unorm_file":"Unorm.txt","L_x":2*np.pi,"L_z":np.pi,"L_y":1,
-                                         "uvw_folder_tf":"../../P125_21pi_vu_tf",
+                                         "unorm_file":"Unorm.txt","tb_norm_file":"tb_norm.txt","L_x":2*np.pi,
+                                         "L_z":np.pi,"L_y":1,"uvw_folder_tf":"../../P125_21pi_vu_tf",
                                          "uvw_folderii_tf":"P125_21pi_vu.$INDEX$",
                                          "rey":125,"utau":0.060523258443963,"ssh_flag_train":False,
                                          "uvw_folder_temp":"-","ssh_server":"-","ssh_username":"-","ssh_password":"-",
@@ -140,6 +142,8 @@ class deep_model():
             Data:
                 - uvw_folder      : folder of the velocity fields
                 - uvw_file        : file name of the velocity fileds without index
+                - tb_folder       : folder of the turbulent budget fields
+                - tb_file         : file name of the turbulent budget fields without index
                 - padding         : padding of the fields
                 - dx              : downsampling in x
                 - dy              : downsampling in y
@@ -147,6 +151,7 @@ class deep_model():
                 - data_folder     : folder for storing the data of the model
                 - umean_file      : file of the mean velocity
                 - unorm_file      : file for the normalization of the velocity
+                - tb_norm_file    : file for the normalization of the turbulent budget
                 - L_x             : size of the channel in the streamwise direction
                 - L_z             : size of the channel in the spanwise dirction
                 - L_y             : half of the width of the channel
@@ -177,28 +182,31 @@ class deep_model():
         # ---------------------------------------------------------------------------------------------------------------
         # Read the data
         # ---------------------------------------------------------------------------------------------------------------   
-        self.uvw_folder      = str(data_in["uvw_folder"])        # Folder path from the main file
-        self.uvw_file        = str(data_in["uvw_file"])          # File name without the index
-        self.padding         = int(data_in["padding"])           # Padding of the field
-        self.dx              = int(data_in["dx"])                # Downsampling in x
-        self.dy              = int(data_in["dy"])                # Downsampling in y
-        self.dz              = int(data_in["dz"])                # Downsampling in z
-        self.data_folder     = str(data_in["data_folder"])       # Folder for the generated data
-        self.umean_file      = str(data_in["umean_file"])        # file of the mean velocity
-        self.unorm_file      = str(data_in["unorm_file"])        # file for the normalization of the velocity
-        self.L_x             = float(data_in["L_x"])             # size of the streamwise dimension of the channel
-        self.L_z             = float(data_in["L_z"])             # size of the streamwise dimension of the channel
-        self.L_y             = float(data_in["L_y"])             # size of half of the width of the channel
-        self.uvw_folder_tf   = str(data_in["uvw_folder_tf"])     # Folder path for the tf format data
-        self.uvw_folderii_tf = str(data_in["uvw_folderii_tf"])   # File for the tf format data
-        self.rey             = float(data_in["rey"])             # Friction reynolds number
-        self.utau            = float(data_in["utau"])            # Friction velocity
-        self.ssh_flag_train  = bool(data_in["ssh_flag_train"])   # Flag for reading the files via ssh
-        self.uvw_folder_temp = str(data_in["uvw_folder_temp"])   # Folder to temporally store the files
-        self.ssh_server      = str(data_in["ssh_server"])        # Server to read the files
-        self.ssh_username    = str(data_in["ssh_username"])      # username of the server
-        self.ssh_password    = str(data_in["ssh_password"])      # password of the server
-        self.error_file      = str(data_in["error_file"])        # file to store the prediction errors
+        self.uvw_folder      = str(data_in["uvw_folder"])        
+        self.uvw_file        = str(data_in["uvw_file"])          
+        self.tb_folder       = str(data_in["tb_folder"])        
+        self.tb_file         = str(data_in["tb_file"])          
+        self.padding         = int(data_in["padding"])          
+        self.dx              = int(data_in["dx"])              
+        self.dy              = int(data_in["dy"])             
+        self.dz              = int(data_in["dz"])             
+        self.data_folder     = str(data_in["data_folder"])      
+        self.umean_file      = str(data_in["umean_file"])     
+        self.unorm_file      = str(data_in["unorm_file"])      
+        self.tb_norm_file    = str(data_in["tb_norm_file"])    
+        self.L_x             = float(data_in["L_x"])           
+        self.L_z             = float(data_in["L_z"])        
+        self.L_y             = float(data_in["L_y"])            
+        self.uvw_folder_tf   = str(data_in["uvw_folder_tf"])    
+        self.uvw_folderii_tf = str(data_in["uvw_folderii_tf"])  
+        self.rey             = float(data_in["rey"])             
+        self.utau            = float(data_in["utau"])          
+        self.ssh_flag_train  = bool(data_in["ssh_flag_train"])  
+        self.uvw_folder_temp = str(data_in["uvw_folder_temp"]) 
+        self.ssh_server      = str(data_in["ssh_server"])        
+        self.ssh_username    = str(data_in["ssh_username"])     
+        self.ssh_password    = str(data_in["ssh_password"])     
+        self.error_file      = str(data_in["error_file"])       
         self.umax_file       = str(data_in["umax_file"])
         self.urmspred_file   = str(data_in["urmspred_file"])
         
@@ -1472,12 +1480,14 @@ class deep_model():
                                 "shpx":self.shpx,"shpy":self.shpy,"shpz":self.shpz,"data_type":self.data_type,
                                 "datasets":ind_vec,"output_path":self.tfrecord_folder})
         else:
-            merge_data(data_in={"base_directory":self.uvw_folder,"base_file":self.uvw_file,"padding":self.padding,
-                                "shpx":self.shpx,"shpy":self.shpy,"shpz":self.shpz,"dx":self.dx,"dy":self.dy,
-                                "dz":self.dz,"data_type":self.data_type,"datasets":ind_vec,
+            merge_data(data_in={"base_directory_uvw":self.uvw_folder,"base_file_uvw":self.uvw_file,
+                                "base_directory_tb":self.tb_folder,"base_file_tb":self.tb_file,
+                                "padding":self.padding,"shpx":self.shpx,"shpy":self.shpy,"shpz":self.shpz,
+                                "dx":self.dx,"dy":self.dy,"dz":self.dz,"data_type":self.data_type,"datasets":ind_vec,
                                 "output_path":self.tfrecord_folder,"data_folder":self.data_folder,
                                 "umean_file":self.umean_file,"unorm_file":self.unorm_file,
-                                "mean_norm":self.mean_norm,"delta_pred":self.delta_pred})
+                                "tb_norm_file":self.tb_norm_file,"mean_norm":self.mean_norm,
+                                "delta_pred":self.delta_pred})
             
     def _read_fieldsvec(self):
         """
