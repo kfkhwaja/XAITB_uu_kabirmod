@@ -7,13 +7,9 @@ Created on Wed Apr  3 09:55:21 2024
 Folder structure for the problem: folders and files for the flow fields, structures and shaps. Parameters:
     - uvw_folder                : Folder of the velocity data
     - uvw_file                  : This file does not contain the file index
-    - tb_folder                 : Folder of the velocity data
-    - tb_file                   : This file does not contain the file index
     - uvw_folder_tf             : Folder of the velocity data with tensorflow format
     - uvw_folderii_tf           : File of the velocity data with tensorflow format
     - tfrecord_folder           : Folder to the tfrecord files
-    - tfrecord_train            : File storing the information of the training tfrecord
-    - tfrecord_vali             : File storing the information of the validation tfrecord
     - uvw_folder_tf_ssh         : Folder of the velocity data with tensorflow format in external server
     - uvw_folder_temp           : Temporal folder for the velocity data
     - ssh_flag_train            : flag for selecting external server
@@ -23,7 +19,6 @@ Folder structure for the problem: folders and files for the flow fields, structu
     - data_folder               : Folder for storing the data of the model
     - umean_file                : File for the mean velocity
     - unorm_file                : File for the normalization of the velocity
-    - tb_norm_file              : File for the normalization of the turbulent budget
     - urms_file                 : File to save the rms of the velocity
     - umax_file                 : File containing the maximum and minimum values of the velocity
     - hist_file                 : File to store the training history
@@ -39,8 +34,6 @@ Folder structure for the problem: folders and files for the flow fields, structu
     - model_write               : Name of the model
     - model_read                : Name of a model to read
     - plot_folders              : Folder containing the figures
-    - shap_folders              : Folder to store the shap values
-    - shap_file                 : File to store the shap values
     - uv_folder                 : folder to store the Reynolds stress value
     - uv_file                   : file to store the Reynolds stress value
     - streak_folder             : folder of the streaks
@@ -49,6 +42,16 @@ Folder structure for the problem: folders and files for the flow fields, structu
     - chong_file                : file of the chong vortices
     - hunt_folder               : folder of the hunt vortices
     - hunt_file                 : file of the hunt vortices
+    - SHAPq_folder              : folder to define the SHAP structures
+    - SHAPq_file                : file to define the SHAP structures
+    - shap_folder               : Folder to store the shap values
+    - shap_file                 : File to store the shap values
+    - shapseg_uv_folder         : folder to store the shap values for segmented domains using Qs
+    - shapseg_uv_file           : file to store the shap values for segmented domains using Qs
+    - shapseg_streak_folder     : folder to store the shap values for segmented domains using streaks
+    - shapseg_streak_file       : file to store the shap values for segmented domains using streaks
+    - shapseg_vortices_folder   : folder to store the shap values for segmented domains using vortices
+    - shapseg_vortices_file     : file to store the shap values for segmented domains using vortices
     - uv_shap_file              : file to evaluate the coincidence of uv structures and shap structures
     - streak_shap_file          : file to evaluate the coincidence of streaks and shap structures
     - chong_shap_file           : file to evaluate the coincidence of chong vortices and shap structures
@@ -59,6 +62,8 @@ Folder structure for the problem: folders and files for the flow fields, structu
     - streak_chong_file         : file to evaluate the coincidence of streaks and chong structures
     - uv_chong_streak_shap_file : file to evaluate the coincidence of Q, chong, streak and shap structures
     - calc_coin_tot_4types      : file containing the coincidence between all the structures using 4 types
+    - traintest_index           : file to store the train and test indices
+    - uv_chong_streak_file      : file with the coincidence between the Q events, streaks and Chong vortices
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -67,31 +72,29 @@ Folder structure for the problem: folders and files for the flow fields, structu
 # Data for the flow fields
 #     - uvw_folder : Folder of the velocity data
 #     - uvw_file   : This file does not contain the file index
-#     - tb_folder  : Folder of the turbulent budget data
-#     - tb_file    : This file does not contain the file index
 # ----------------------------------------------------------------------------------------------------------------------
-uvw_folder = '/data1/P125/phys/'
-uvw_file   = 'P125_83pi.$INDEX$.h5.uvw'
-tb_folder  = '/poiseuille/P125_83/cor'
-tb_file    = 'P125_83tb.$INDEX$.h5.itb'
+uvw_folder = '/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/uvw/'
+uvw_file   = 'P125_83tb.$INDEX$.h5.uvw'
+tb_folder  = '/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/itb/prod/'
+tb_file    = 'P125_83tb_prod.$INDEX$.h5.itb'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Data for the flow fields in the tensorflow format
-#     - uvw_folder_tf     : Folder of the velocity data with tensorflow format
-#     - uvw_folderii_tf   : File of the velocity data with tensorflow format
+#     - uvw_folder_tf     : Folder of the velocity data with tensorflow format (not in use)
+#     - uvw_folderii_tf   : File of the velocity data with tensorflow format (not in use)
 #     - tfrecord_folder   : Folder to the tfrecord files
-#     - tfrecord_train    : File storing the information of the training tfrecord
-#     - tfrecord_vali     : File storing the information of the validation tfrecord
-#     - uvw_folder_tf_ssh : Folder of the velocity data with tensorflow format in external server
-#     - uvw_folder_temp   : Temporal folder for the velocity data
-#     - ssh_flag_train    : flag for selecting external server
-#     - ssh_server        : server for loading the data
-#     - ssh_username      : user of the server
-#     - ssh_password      : password of the server
+#     - uvw_folder_tf_ssh : Folder of the velocity data with tensorflow format in external server (not in use)
+#     - uvw_folder_temp   : Temporal folder for the velocity data (not in use)
+#     - ssh_flag_train    : flag for selecting external server keep False to avoid using (not in use) the not in use 
+#                           was set for loading small portions of the database from a different server during training.
+#                           this option is not prepared to work in TFRecords properly and is better to avoid it. 
+#     - ssh_server        : server for loading the data (not in use)
+#     - ssh_username      : user of the server (not in use)
+#     - ssh_password      : password of the server (not in use)
 # ----------------------------------------------------------------------------------------------------------------------
 uvw_folder_tf     = "-"
 uvw_folderii_tf   = '-'
-tfrecord_folder   = '/poiseuille/P125_83/tfrecord_tb_uu/'
+tfrecord_folder   = '/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/tfrecords/'
 uvw_folder_tf_ssh = uvw_folder_tf
 uvw_folder_temp   = "-"
 ssh_flag_train    = False
@@ -105,10 +108,10 @@ ssh_password      = "-"
 #     - umean_file          : File for the mean velocity
 #     - unorm_file          : File for the normalization of the velocity
 #     - tb_norm_file        : File for the normalization of the turbulent budget
+#     - umax_file           : File containing the maximum and minimum values of the velocity
 #     - urms_file           : file to save the rms of the velocity
 #     - hist_file           : File to store the training history
 #     - error_file          : File to store the error in the predictions
-#     - umax_file           : File containing the maximum and minimum values of the velocity
 #     - urmspred_file       : File to save the rms predicted by the model
 #     - SHAPmean_file       : File to save the mean SHAP values
 #     - SHAPrms_file        : File to save the rms of the SHAP values
@@ -117,7 +120,7 @@ ssh_password      = "-"
 #     - file_repetition     : File with data of the repetitions
 #     - file_snr            : File with data of the SNR
 # ----------------------------------------------------------------------------------------------------------------------
-data_folder         = "/poiseuille/P125_83/P125_83pi_data/d20250210_Data_tb_uu"
+data_folder         = "/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/strat/data/"
 umean_file          = "Umean.txt"
 unorm_file          = "norm.txt"
 tb_norm_file        = "tb_norm.txt"
@@ -140,14 +143,14 @@ file_snr            = "repetitions_shap_snr.txt"
 #     - model_write  : Name of the model
 #     - model_read   : Name of a model to load
 # ----------------------------------------------------------------------------------------------------------------------
-model_folder = "/poiseuille/P125_83/P125_83pi_data/d20250210_models_tb_uu"
-model_write  = "trained_model_tb_0001.h5"
-model_read   = "trained_model_tb_0001.h5"
+model_folder = "/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/strat/models/"
+model_write  = "trained_model_prod_0001.h5"
+model_read   = "trained_model_prod_0001.h5"
 # ----------------------------------------------------------------------------------------------------------------------
 # Data for the plots:
 #     - plot_folder : folder to store the plots
 # ----------------------------------------------------------------------------------------------------------------------
-plot_folder = "/poiseuille/P125_83/P125_83pi_data/d20250210_plots_tb_uu"
+plot_folder = "/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/strat/plots/"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Data for the uv structures
@@ -175,17 +178,17 @@ SHAPq_uvw_file   = "-"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Data for the SHAP values
-#     - shap_folder    : folder to store the shap values
-#     - shap_file      : file to store the shap values
-#     - shapseg_uv_folder : folder to store the shap values for segmented domains using Qs
-#     - shapseg_uv_file   : file to store the shap values for segmented domains using Qs
-#     - shapseg_streak_folder : folder to store the shap values for segmented domains using streaks
-#     - shapseg_streak_file   : file to store the shap values for segmented domains using streaks
+#     - shap_folder             : folder to store the shap values
+#     - shap_file               : file to store the shap values
+#     - shapseg_uv_folder       : folder to store the shap values for segmented domains using Qs
+#     - shapseg_uv_file         : file to store the shap values for segmented domains using Qs
+#     - shapseg_streak_folder   : folder to store the shap values for segmented domains using streaks
+#     - shapseg_streak_file     : file to store the shap values for segmented domains using streaks
 #     - shapseg_vortices_folder : folder to store the shap values for segmented domains using vortices
 #     - shapseg_vortices_file   : file to store the shap values for segmented domains using vortices
 # ----------------------------------------------------------------------------------------------------------------------
-shap_folder           = "/poiseuille/P125_83/SHAP_d20250210_tb_uu"
-shap_file             = "P125_83pi_nsample$NSAMPLES$.$INDEX$.h5.shap"
+shap_folder           = "/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/strat/shap/"
+shap_file             = "P125_83tb_nsample$NSAMPLES$.$INDEX$.h5.shap"
 shapseg_uv_folder     = "-"
 shapseg_uv_file       = "-"
 shapseg_chong_folder  = "-"
@@ -205,6 +208,8 @@ shapseg_streak_file   = "-"
 #     - streak_chong_file         : file to evaluate the coincidence of streaks and chong structures
 #     - uv_chong_streak_shap_file : file to evaluate the coincidence of Q, chong, streak and shap structures
 #     - calc_coin_tot_4types      : file containing the coincidence between all the structures using 4 types
+#     - traintest_index           : file to store the train and test indices
+#     - uv_chong_streak_file      : file with the coincidence between the Q events, streaks and Chong vortices
 # ----------------------------------------------------------------------------------------------------------------------
 uv_shap_file              = "uv_shap_coin.txt"
 streak_shap_file          = "streak_shap_coin.txt"

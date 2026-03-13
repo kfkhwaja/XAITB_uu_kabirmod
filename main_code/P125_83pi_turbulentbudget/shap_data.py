@@ -21,8 +21,8 @@ Data for the training of the model:
 #     - field_fin   : Final field of the training
 #     - field_delta : Separation between files
 # ----------------------------------------------------------------------------------------------------------------------
-field_ini   = 20950
-field_fin   = 21000 #27999 
+field_ini   = 10000
+field_fin   = 10009 #27999 
 field_delta = 1
 
 # ----------------------------------------------------------------------------------------------------------------------

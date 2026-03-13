@@ -518,10 +518,14 @@ class deep_model():
         # Create the model
         # --------------------------------------------------------------------------------------------------------------
         if self.ngpu > 0:
-            mixed_precision.set_global_policy('mixed_float16')
+            mixed_precision.set_global_policy('float32')
             
         if self.ngpu == 0:
-            model0     = tf.keras.models.load_model(self.model_folder+'/'+self.model_read)
+            # model0     = tf.keras.models.load_model(self.model_folder+'/'+self.model_read)
+            model0 = tf.keras.models.load_model(
+                self.model_folder + '/' + self.model_read,
+                compile=False
+            )
             weight0    = model0.get_weights()
             self.model_base()	
             optimizer  = RMSprop(learning_rate=self.learat,momentum=self.optmom) 																 
@@ -953,13 +957,51 @@ class deep_model():
         # --------------------------------------------------------------------------------------------------------------
         # Calculate the predicted field
         # --------------------------------------------------------------------------------------------------------------
-        field_pred = self.model.predict(field_in)
+        # print('calculating predicted field')
+        # field_pred = self.model.predict(field_in)
+        # print('predicted field')
+        # del field_in
+        # print('deleted field in')
+        # data_out   = dim_velocity(data_in={"unorm":field_pred[0,:,:,:,0],"vnorm":field_pred[0,:,:,:,1],
+        #                                    "wnorm":field_pred[0,:,:,:,2],"folder_data":self.data_folder,
+        #                                    "unorm_file":self.unorm_file,"data_type":self.data_type,
+        #                                    "mean_norm":self.mean_norm})
+        # return data_out
+
+        print('calculating predicted field')
+
+        # Run inference WITHOUT predict() overhead
+        field_pred = self.model(field_in, training=False)
+
+        # Immediately extract components
+        uu_n = field_pred[0, :, :, :, 0].numpy()
+        vv_n = field_pred[0, :, :, :, 1].numpy()
+        ww_n = field_pred[0, :, :, :, 2].numpy()
+
+        # Free large tensors ASAP
+        del field_pred
         del field_in
-        data_out   = dim_velocity(data_in={"unorm":field_pred[0,:,:,:,0],"vnorm":field_pred[0,:,:,:,1],
-                                           "wnorm":field_pred[0,:,:,:,2],"folder_data":self.data_folder,
-                                           "unorm_file":self.unorm_file,"data_type":self.data_type,
-                                           "mean_norm":self.mean_norm})
+        import gc; gc.collect()
+
+        print('predicted field')
+
+        data_out = dim_velocity(data_in={
+            "unorm": uu_n,
+            "vnorm": vv_n,
+            "wnorm": ww_n,
+            "folder_data": self.data_folder,
+            "unorm_file": self.unorm_file,
+            "data_type": self.data_type,
+            "mean_norm": self.mean_norm
+        })
+
+        # Free normalized arrays
+        del uu_n, vv_n, ww_n
+        gc.collect()
+
         return data_out
+        
+
 
     def field_error(self,data_in={"index_ii":1000}):
         """
@@ -998,10 +1040,15 @@ class deep_model():
         # Predict the field
         # ----------------------------------------------------------------------------------------------------------
         dim_pred                = self.pred_field(data_in={"index_ii":index_ii})
-        field_out_pred          = np.zeros((self.shpy,self.shpz,self.shpx,3),dtype=self.data_type)
-        field_out_pred[:,:,:,0] = dim_pred["uu"]
-        field_out_pred[:,:,:,1] = dim_pred["vv"]
-        field_out_pred[:,:,:,2] = dim_pred["ww"]
+        print('predicted field')
+        # field_out_pred          = np.zeros((self.shpy,self.shpz,self.shpx,3),dtype=self.data_type)
+        # field_out_pred[:,:,:,0] = dim_pred["uu"]
+        # field_out_pred[:,:,:,1] = dim_pred["vv"]
+        # field_out_pred[:,:,:,2] = dim_pred["ww"]
+        field_out_pred = np.stack(
+            (dim_pred["uu"], dim_pred["vv"], dim_pred["ww"]),
+            axis=-1
+        )
         
         # --------------------------------------------------------------------------------------------------------------
         # Read the output file
@@ -1025,6 +1072,9 @@ class deep_model():
         vref      = np.max([abs(data_norm["vvmax"]),abs(data_norm["vvmin"])])
         wref      = np.max([abs(data_norm["wwmax"]),abs(data_norm["wwmin"])])
         errorfun  = abs(field_out-field_out_pred)
+
+        del field_out_pred
+        gc.collect()
         
         # --------------------------------------------------------------------------------------------------------------
         # Generate the output
@@ -1042,6 +1092,8 @@ class deep_model():
         data_out["sim_v"] = velocity_out["vv"]
         data_out["sim_w"] = velocity_out["ww"]
         del velocity_out
+        del field_out
+        gc.collect()
         return data_out
                          
     def pred_error(self):
@@ -1097,6 +1149,9 @@ class deep_model():
             print("Error v:"+str(errv/errvol*100)+"%",flush=True)
             print("Error w:"+str(errw/errvol*100)+"%",flush=True)
             del erru,errv,errw,errvol,data_error
+            import tensorflow as tf
+            tf.keras.backend.clear_session()
+            gc.collect()
             
         error_u /= n_error
         error_v /= n_error

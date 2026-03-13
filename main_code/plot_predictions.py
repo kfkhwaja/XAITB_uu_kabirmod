@@ -34,7 +34,7 @@ import numpy as np
 # - folder_def : folder containing the files with the definitions required in the problem
 # - folders    : file containing the folder and file structures
 # -----------------------------------------------------------------------------------------------------------------------
-folder_def  = "d20240603_definitions"
+folder_def  = "P125_83pi_turbulentbudget"
 chd_str     = "channel_data"
 folders_str = "folders"
 tr_data_str = "training_data"

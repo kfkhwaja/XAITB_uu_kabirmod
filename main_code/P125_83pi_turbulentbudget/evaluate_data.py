@@ -60,8 +60,8 @@ batch_size  = 8
 #                     batch size, False: use the default data loaded in memory)
 #     - prefetch    : Number of batches to load in memory
 # ----------------------------------------------------------------------------------------------------------------------
-field_ini   = 20000
-field_fin   = 28000
+field_ini   = 10000
+field_fin   = 10009
 field_delta = 1
 field_mem   = 1280
 test_size   = 0.2
