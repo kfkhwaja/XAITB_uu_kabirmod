@@ -957,50 +957,13 @@ class deep_model():
         # --------------------------------------------------------------------------------------------------------------
         # Calculate the predicted field
         # --------------------------------------------------------------------------------------------------------------
-        # print('calculating predicted field')
-        # field_pred = self.model.predict(field_in)
-        # print('predicted field')
-        # del field_in
-        # print('deleted field in')
-        # data_out   = dim_velocity(data_in={"unorm":field_pred[0,:,:,:,0],"vnorm":field_pred[0,:,:,:,1],
-        #                                    "wnorm":field_pred[0,:,:,:,2],"folder_data":self.data_folder,
-        #                                    "unorm_file":self.unorm_file,"data_type":self.data_type,
-        #                                    "mean_norm":self.mean_norm})
-        # return data_out
-
-        print('calculating predicted field')
-
-        # Run inference WITHOUT predict() overhead
-        field_pred = self.model(field_in, training=False)
-
-        # Immediately extract components
-        uu_n = field_pred[0, :, :, :, 0].numpy()
-        vv_n = field_pred[0, :, :, :, 1].numpy()
-        ww_n = field_pred[0, :, :, :, 2].numpy()
-
-        # Free large tensors ASAP
-        del field_pred
+        field_pred = self.model.predict(field_in)
         del field_in
-        import gc; gc.collect()
-
-        print('predicted field')
-
-        data_out = dim_velocity(data_in={
-            "unorm": uu_n,
-            "vnorm": vv_n,
-            "wnorm": ww_n,
-            "folder_data": self.data_folder,
-            "unorm_file": self.unorm_file,
-            "data_type": self.data_type,
-            "mean_norm": self.mean_norm
-        })
-
-        # Free normalized arrays
-        del uu_n, vv_n, ww_n
-        gc.collect()
-
+        data_out   = dim_velocity(data_in={"unorm":field_pred[0,:,:,:,0],"vnorm":field_pred[0,:,:,:,1],
+                                           "wnorm":field_pred[0,:,:,:,2],"folder_data":self.data_folder,
+                                           "unorm_file":self.unorm_file,"data_type":self.data_type,
+                                           "mean_norm":self.mean_norm})
         return data_out
-        
 
 
     def field_error(self,data_in={"index_ii":1000}):
