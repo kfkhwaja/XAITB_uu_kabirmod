@@ -73,9 +73,9 @@ Folder structure for the problem: folders and files for the flow fields, structu
 #     - uvw_folder : Folder of the velocity data
 #     - uvw_file   : This file does not contain the file index
 # ----------------------------------------------------------------------------------------------------------------------
-uvw_folder = '/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/uvw/'
+uvw_folder = '/scratch/rvinuesa_root/rvinuesa/khwaja/test_data_kabir/uvw/'
 uvw_file   = 'P125_83tb.$INDEX$.h5.uvw'
-tb_folder  = '/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/itb/prod/'
+tb_folder  = '/scratch/rvinuesa_root/rvinuesa/khwaja/test_data_kabir/itb/prod/'
 tb_file    = 'P125_83tb_prod.$INDEX$.h5.itb'
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ tb_file    = 'P125_83tb_prod.$INDEX$.h5.itb'
 # ----------------------------------------------------------------------------------------------------------------------
 uvw_folder_tf     = "-"
 uvw_folderii_tf   = '-'
-tfrecord_folder   = '/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/tfrecords/'
+tfrecord_folder   = '/scratch/rvinuesa_root/rvinuesa/khwaja/test_data_kabir/tfrecords/'
 uvw_folder_tf_ssh = uvw_folder_tf
 uvw_folder_temp   = "-"
 ssh_flag_train    = False
@@ -120,7 +120,7 @@ ssh_password      = "-"
 #     - file_repetition     : File with data of the repetitions
 #     - file_snr            : File with data of the SNR
 # ----------------------------------------------------------------------------------------------------------------------
-data_folder         = "/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/strat/data/"
+data_folder         = "/scratch/rvinuesa_root/rvinuesa/khwaja/test_data_kabir/strat/data/"
 umean_file          = "Umean.txt"
 unorm_file          = "norm.txt"
 tb_norm_file        = "tb_norm.txt"
@@ -143,14 +143,14 @@ file_snr            = "repetitions_shap_snr.txt"
 #     - model_write  : Name of the model
 #     - model_read   : Name of a model to load
 # ----------------------------------------------------------------------------------------------------------------------
-model_folder = "/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/strat/models/"
+model_folder = "/scratch/rvinuesa_root/rvinuesa/khwaja/test_data_kabir/strat/models/"
 model_write  = "trained_model_prod_0001.h5"
 model_read   = "trained_model_prod_0001.h5"
 # ----------------------------------------------------------------------------------------------------------------------
 # Data for the plots:
 #     - plot_folder : folder to store the plots
 # ----------------------------------------------------------------------------------------------------------------------
-plot_folder = "/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/strat/plots/"
+plot_folder = "/scratch/rvinuesa_root/rvinuesa/khwaja/test_data_kabir/strat/plots/"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Data for the uv structures
@@ -187,7 +187,7 @@ SHAPq_uvw_file   = "-"
 #     - shapseg_vortices_folder : folder to store the shap values for segmented domains using vortices
 #     - shapseg_vortices_file   : file to store the shap values for segmented domains using vortices
 # ----------------------------------------------------------------------------------------------------------------------
-shap_folder           = "/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/strat/shap/"
+shap_folder           = "/scratch/rvinuesa_root/rvinuesa/khwaja/test_data_kabir/strat/shap/"
 shap_file             = "P125_83tb_nsample$NSAMPLES$.$INDEX$.h5.shap"
 shapseg_uv_folder     = "-"
 shapseg_uv_file       = "-"

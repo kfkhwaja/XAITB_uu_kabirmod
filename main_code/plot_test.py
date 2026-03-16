@@ -9,7 +9,7 @@ def read_array_file(filename):
     return arrays
 
 # Read Umean
-UUmean, VVmean, WWmean = read_array_file('/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/strat/data/Umean.txt')
+UUmean, VVmean, WWmean = read_array_file('/scratch/rvinuesa_root/rvinuesa/khwaja/test_data_kabir/strat/data/Umean.txt')
 y = np.arange(len(UUmean))
 
 plt.figure()
@@ -22,7 +22,7 @@ plt.legend()
 plt.show()
 
 # Read Urms
-uurms, vvrms, wwrms, uv, vw, uw = read_array_file('/Users/kabirkhwaja/Desktop/College/VinuesaLab/test/test_data_kabir/strat/data/Urms.txt')
+uurms, vvrms, wwrms, uv, vw, uw = read_array_file('/scratch/rvinuesa_root/rvinuesa/khwaja/test_data_kabir/strat/data/Urms.txt')
 
 plt.figure()
 plt.plot(uurms, y, label='u rms')

@@ -28,7 +28,8 @@ In order to launch the code the following variables need to be fulfilled:
 #     - tr_data_str : file containing the data of the training
 #     - sh_data_str : file containing the data for the SHAP values 
 # ----------------------------------------------------------------------------------------------------------------------
-folder_def  = "d20240703_definitions"#"P125_83pi_240603_v0_definitions"
+#folder_def  = "d20240703_definitions"#"P125_83pi_240603_v0_definitions"
+folder_def  = "P125_83pi_turbulentbudget"
 chd_str     = "channel_data"
 folders_str = "folders"
 tr_data_str = "training_data"
