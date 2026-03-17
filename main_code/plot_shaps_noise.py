@@ -45,7 +45,8 @@ os.environ['HDF5_USE_FILE_LOCKING'] = 'FALSE'
 # - folder_def : folder containing the files with the definitions required in the problem
 # - folders    : file containing the folder and file structures
 # -----------------------------------------------------------------------------------------------------------------------
-folder_def  = "d20240703_definitions"
+#folder_def  = "d20240703_definitions"
+folder_def  = "P125_83pi_turbulentbudget"
 chd_str     = "channel_data"
 folders_str = "folders"
 tr_data_str = "training_data"
@@ -77,7 +78,7 @@ sh_data_str = "shap_data"
 #     - scale_shap  : factor to scale the shap values
 #     - colormapsh  : colormap for the shaps
 # -----------------------------------------------------------------------------------------------------------------------
-fields      = "_0"
+fields      = ""
 nfield      = "1 field for computing SHAP"
 xlabel      = "$x^+$"
 ylabel      = "$z^+$"
@@ -87,9 +88,9 @@ figsize_x   = 9
 figsize_y   = 8
 colormap    = "viridis"
 colornum    = 3
-fig_name    = "shapfield_noise"+fields
+fig_name    = "shapfield_noise"
 dpi         = 200
-index_ii    = 20000
+index_ii    = 10000
 index_y     = 20
 ymin        = 0
 ymax        = 3*np.pi

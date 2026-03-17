@@ -1,0 +1,9 @@
+tensorflow==2.10.0
+numpy>=1.21,<1.24
+scipy>=1.7
+h5py>=3.7
+matplotlib>=3.5
+numba>=0.56
+tqdm>=4.60
+pandas>=1.4
+

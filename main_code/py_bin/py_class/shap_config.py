@@ -222,7 +222,9 @@ class shap_config():
         # ---------------------------------------------------------------------------------------------------------------
         # Create the model
         # ---------------------------------------------------------------------------------------------------------------
-        unet_data  = {"uvw_folder":self.uvw_folder,"uvw_file":self.uvw_file,"padding":self.padding,"dx":self.dx,
+        unet_data  = {"uvw_folder":self.uvw_folder,"uvw_file":self.uvw_file,
+		      "tb_folder":"-","tb_file":"-","tb_norm_file":"-", # ADDED
+		      "padding":self.padding,"dx":self.dx,
                       "dy":self.dy,"dz":self.dz,"data_folder":self.data_folder,"umean_file":self.umean_file,
                       "unorm_file":self.unorm_file,"L_x":self.L_x,"L_z":self.L_z,"L_y":self.L_y,
                       "uvw_folder_tf":"-","uvw_folderii_tf":"-","rey":self.rey,"utau":self.utau,

@@ -21,7 +21,8 @@ variables:
 # - folders    : file containing the folder and file structures
 # - st_data    : file containing the data of the statistics
 # -----------------------------------------------------------------------------------------------------------------------
-folder_def  = "d20240703_definitions"
+#folder_def  = "d20240703_definitions"
+folder_def  = "P125_83pi_turbulentbudget"
 chd_str     = "channel_data"
 folders_str = "folders"
 st_data_str = "stats_data_shap"

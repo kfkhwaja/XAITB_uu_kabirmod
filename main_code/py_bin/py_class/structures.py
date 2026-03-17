@@ -181,8 +181,32 @@ class structures():
         self.shpx          = flowfield.shpx         # shape of the tensors in the streamwise direction
         self.shpy          = flowfield.shpy         # shape of the tensors in the wall-normal direction
         self.shpz          = flowfield.shpz         # shape of the tensors in the spanwise direction
-        
+    
     def separate_structures(self):
+        # new version
+        from scipy.ndimage import label
+        import numpy as np
+        
+        ny, nz, nx = self.mat_struc.shape
+        
+        # Define connectivity structure (6-connectivity, same as original)
+        struct = np.array([[[0,0,0],[0,1,0],[0,0,0]],
+                           [[0,1,0],[1,1,1],[0,1,0]],
+                           [[0,0,0],[0,1,0],[0,0,0]]])
+        
+        # Pad periodically in z and x before labeling
+        mat_padded = np.pad(self.mat_struc, ((0,0),(1,1),(1,1)), mode='wrap')
+        labeled_padded, num_features = label(mat_padded, structure=struct)
+        labeled = labeled_padded[:,1:-1,1:-1]
+        
+        # Convert to same format as original (list of node arrays)
+        self.nodes = []
+        for ii in np.arange(1, num_features+1):
+            coords = np.array(np.where(labeled == ii))
+            self.nodes.append(coords)
+
+    
+    def OLD_separate_structures(self):
         """
         .................................................................................................................
         # separate_structures
