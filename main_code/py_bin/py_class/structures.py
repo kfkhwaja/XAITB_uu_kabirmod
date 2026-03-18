@@ -354,9 +354,105 @@ class structures():
                     self.nodes.append(np.array(list_struc).T)
         
                 
-            
-
     def physicalproperties_structures(self):
+        self.dim_x   = np.zeros((len(self.nodes),),dtype="float")
+        self.dim_y   = np.zeros((len(self.nodes),),dtype="float")
+        self.dim_z   = np.zeros((len(self.nodes),),dtype="float")
+        self.ymin    = np.zeros((len(self.nodes),),dtype="float")
+        self.ymax    = np.zeros((len(self.nodes),),dtype="float")
+        self.boxvol  = np.zeros((len(self.nodes),),dtype="float")
+        self.vol     = np.zeros((len(self.nodes),),dtype="float")
+        self.cg_x    = np.zeros((len(self.nodes),),dtype="float")
+        self.cg_z    = np.zeros((len(self.nodes),),dtype="float")
+        self.cg_y    = np.zeros((len(self.nodes),),dtype="float")
+        self.cg_xbox = np.zeros((len(self.nodes),),dtype="float")
+        self.cg_zbox = np.zeros((len(self.nodes),),dtype="float")
+        self.cg_ybox = np.zeros((len(self.nodes),),dtype="float")
+        self.inv_chn = np.zeros((len(self.nodes),),dtype="bool")
+        
+        for nn in np.arange(len(self.nodes)):
+            struc_points = self.nodes[nn].astype('int')
+            y0, z0, x0   = struc_points[0,:], struc_points[1,:], struc_points[2,:]
+            vols          = self.grid_vol_plus[y0, z0, x0]
+            
+            ymin             = self.y_h_plus[int(np.min(y0))]
+            ymax             = self.y_h_plus[int(np.max(y0))]
+            dim_y            = np.abs(ymax - ymin)
+            x_sort           = np.sort(x0)
+            z_sort           = np.sort(z0)
+            self.cg_xbox[nn] = np.floor(np.mean(x_sort))
+            self.cg_zbox[nn] = np.floor(np.mean(z_sort))
+            self.cg_ybox[nn] = np.floor(np.mean(y0))
+            
+            # Vectorized center of gravity and volume
+            self.vol[nn]  = np.sum(vols)
+            self.cg_x[nn] = np.sum(self.grid_dx_plus * x0 * vols) / self.vol[nn]
+            self.cg_z[nn] = np.sum(self.grid_dz_plus * z0 * vols) / self.vol[nn]
+            cg_y          = np.sum(self.y_h_plus[y0] * vols) / self.vol[nn]
+            
+            dim_x = self.grid_dx_plus * (np.max(x_sort) - np.min(x_sort))
+            dim_z = self.grid_dz_plus * (np.max(z_sort) - np.min(z_sort))
+            
+            flag_x = bool(np.count_nonzero(x_sort==self.shpx-1)>=1 and np.count_nonzero(x_sort==0)>=1)
+            flag_z = bool(np.count_nonzero(z_sort==self.shpz-1)>=1 and np.count_nonzero(z_sort==0)>=1)
+            
+            if flag_x:
+                x_uni     = np.unique(x_sort)
+                com_cross = x_uni == np.arange(len(x_uni))
+                ind_sym   = np.where(com_cross==0)[0]
+                if not len(ind_sym) == 0:
+                    xmin   = x_uni[ind_sym[0]]
+                    xmax   = self.shpx + x_uni[ind_sym[0]-1]
+                    dim_x  = self.grid_dx_plus * (xmax - xmin)
+                    x_sort_sym              = x_sort.copy()
+                    index_first             = x_sort_sym <= x_uni[ind_sym[0]-1]
+                    x_sort_sym[index_first] = x_sort_sym[index_first] + self.shpx
+                    self.cg_xbox[nn]        = np.mod(np.floor(np.mean(x_sort_sym)), self.shpx)
+                    xind_nodes                    = x0.copy()
+                    index_nodes_first             = xind_nodes <= x_uni[ind_sym[0]-1]
+                    xind_nodes[index_nodes_first] = xind_nodes[index_nodes_first] + self.shpx
+                    # Vectorized cg_x for boundary-crossing case
+                    self.cg_x[nn] = np.sum(self.grid_dx_plus * xind_nodes * vols) / self.vol[nn]
+                    if self.cg_x[nn] > self.grid_dx_plus * self.shpx:
+                        self.cg_x[nn] -= self.grid_dx_plus * self.shpx
+                        
+            if flag_z:
+                z_uni     = np.unique(z_sort)
+                com_cross = z_uni == np.arange(len(z_uni))
+                ind_sym   = np.where(com_cross==0)[0]
+                if not len(ind_sym) == 0:
+                    zmin   = z_uni[ind_sym[0]]
+                    zmax   = self.shpz + z_uni[ind_sym[0]-1]
+                    dim_z  = self.grid_dz_plus * (zmax - zmin)
+                    z_sort_sym              = z_sort.copy()
+                    index_first             = z_sort_sym <= z_uni[ind_sym[0]-1]
+                    z_sort_sym[index_first] = z_sort_sym[index_first] + self.shpz
+                    self.cg_zbox[nn]        = np.mod(np.floor(np.mean(z_sort_sym)), self.shpz)
+                    zind_nodes                    = z0.copy()
+                    index_nodes_first             = zind_nodes <= z_uni[ind_sym[0]-1]
+                    zind_nodes[index_nodes_first] = zind_nodes[index_nodes_first] + self.shpz
+                    # Vectorized cg_z for boundary-crossing case
+                    self.cg_z[nn] = np.sum(self.grid_dz_plus * zind_nodes * vols) / self.vol[nn]
+                    if self.cg_z[nn] > self.grid_dz_plus * self.shpz:
+                        self.cg_z[nn] -= self.grid_dz_plus * self.shpz
+            
+            if cg_y <= 0:
+                self.ymin[nn]    = self.rey + ymin
+                self.ymax[nn]    = self.rey + ymax
+                self.cg_y[nn]    = self.rey + cg_y
+                self.inv_chn[nn] = False
+            else:
+                self.ymin[nn]    = self.rey - ymax
+                self.ymax[nn]    = self.rey - ymin
+                self.cg_y[nn]    = self.rey - cg_y
+                self.inv_chn[nn] = True
+            
+            self.dim_x[nn]  = dim_x
+            self.dim_z[nn]  = dim_z
+            self.dim_y[nn]  = dim_y
+            self.boxvol[nn] = dim_y * dim_x * dim_z        
+
+    def OLD_physicalproperties_structures(self):
         """
         .................................................................................................................
         # physicalproperties_structures
@@ -624,7 +720,7 @@ class structures():
             self.dim_y[nn]  = dim_y
             self.boxvol[nn] = dim_y*dim_x*dim_z
                                 
-    def detect_quadrant(self):
+    def OLD_detect_quadrant(self):
         """
         .................................................................................................................
         # detect_quadrant
@@ -708,8 +804,30 @@ class structures():
             # -----------------------------------------------------------------------------------------------------------
             for nn_node in np.arange(len(struc_points[0,:])):
                 self.mat_event[struc_points[0,nn_node],struc_points[1,nn_node],struc_points[2,nn_node]] = self.event[nn]
-                                               
-    def segmentation(self):
+
+    def detect_quadrant(self):
+        self.mat_event = np.zeros((self.shpy, self.shpz, self.shpx))
+        self.event     = np.zeros((len(self.nodes),))
+        for nn in np.arange(len(self.nodes)):
+            struc_points = self.nodes[nn]
+            y0, z0, x0  = struc_points[0,:], struc_points[1,:], struc_points[2,:]
+            f1          = self.field_1[y0, z0, x0]
+            if self.sym_quad:
+                inv_mask = self.inv_chn[nn]
+                f2       = np.where(inv_mask, -self.field_2[y0, z0, x0], self.field_2[y0, z0, x0])
+            else:
+                f2       = self.field_2[y0, z0, x0]
+            vol_nod      = np.sqrt(f1**2 + f2**2) * self.grid_vol_plus[y0, z0, x0]
+            voltot       = np.array([
+                np.sum(vol_nod[(f1>0) & (f2>0)]),
+                np.sum(vol_nod[(f1<0) & (f2>0)]),
+                np.sum(vol_nod[(f1<0) & (f2<0)]),
+                np.sum(vol_nod[(f1>0) & (f2<0)])
+            ])
+            self.event[nn] = np.argmax(voltot) + 1
+            self.mat_event[y0, z0, x0] = self.event[nn]
+
+    def OLD_segmentation(self):
         """
         .................................................................................................................
         # segmentation
@@ -762,6 +880,25 @@ class structures():
         else:
             self.filtstr_sum = 0
         print('Percentage of filtered structures: '+str(self.filtstr_sum*100)+'%',flush=True)
+
+    def segmentation(self):
+        self.mat_segment          = np.zeros((self.shpy, self.shpz, self.shpx))
+        self.mat_segment_filtered = np.zeros((self.shpy, self.shpz, self.shpx))
+        nn2 = 0
+        nn3 = 0
+        if len(self.nodes) > 0:
+            for nn in np.arange(len(self.nodes)):
+                y0, z0, x0 = self.nodes[nn][0,:], self.nodes[nn][1,:], self.nodes[nn][2,:]
+                self.mat_segment[y0, z0, x0] = nn + 1
+                if self.vol[nn] > self.filvol:
+                    self.mat_segment_filtered[y0, z0, x0] = nn2 + 1
+                    nn2 += 1
+                else:
+                    nn3 += 1
+            self.filtstr_sum = nn3 / (nn2 + nn3)
+        else:
+            self.filtstr_sum = 0
+        print('Percentage of filtered structures: ' + str(self.filtstr_sum*100) + '%', flush=True)
                                   
     def OLD_structure_u1u2(self):
         """
