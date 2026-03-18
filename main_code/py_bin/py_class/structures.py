@@ -183,6 +183,33 @@ class structures():
         self.shpz          = flowfield.shpz         # shape of the tensors in the spanwise direction
     
     def separate_structures(self):
+        # newest version
+        from scipy.ndimage import label
+        import numpy as np
+
+        ny, nz, nx = self.mat_struc.shape
+
+        struct = np.array([[[0,0,0],[0,1,0],[0,0,0]],
+                   [[0,1,0],[1,1,1],[0,1,0]],
+                   [[0,0,0],[0,1,0],[0,0,0]]])
+
+        mat_padded = np.pad(self.mat_struc, ((0,0),(1,1),(1,1)), mode='wrap')
+        labeled_padded, num_features = label(mat_padded, structure=struct)
+        labeled = labeled_padded[:,1:-1,1:-1]
+
+        # Fast conversion using sorting instead of per-label np.where
+        all_coords = np.array(np.where(labeled > 0))  # single scan
+        all_labels = labeled[all_coords[0], all_coords[1], all_coords[2]]
+        sort_idx   = np.argsort(all_labels)
+        all_coords = all_coords[:, sort_idx]
+        all_labels = all_labels[sort_idx]
+        splits     = np.searchsorted(all_labels, np.arange(1, num_features+1))
+        self.nodes = [all_coords[:, splits[i]:splits[i+1]] if i+1 < len(splits) 
+              else all_coords[:, splits[i]:]
+              for i in range(num_features)]    
+        self.nodes = [n for n in self.nodes if n.shape[1] > 0]
+
+    def V2_separate_structures(self):
         # new version
         from scipy.ndimage import label
         import numpy as np
@@ -736,7 +763,7 @@ class structures():
             self.filtstr_sum = 0
         print('Percentage of filtered structures: '+str(self.filtstr_sum*100)+'%',flush=True)
                                   
-    def structure_u1u2(self):
+    def OLD_structure_u1u2(self):
         """
         .................................................................................................................
         # structure_u1u2
@@ -766,7 +793,7 @@ class structures():
                 self.u1u2[nn] += absu1u2[nodes_nn[0][ii],nodes_nn[1][ii],nodes_nn[2][ii]]/u1u2tot
                 
                                         
-    def structure_k123(self):
+    def OLD_structure_k123(self):
         """
         .................................................................................................................
         # structure_k123
@@ -794,3 +821,41 @@ class structures():
             for ii in np.arange(len(nodes_nn[0])):
                 self.k123[nn] += k123[nodes_nn[0][ii],nodes_nn[1][ii],nodes_nn[2][ii]]/k123_tot
             
+
+    def v2_structure_u1u2(self):
+        max_struc = int(np.max(self.mat_segment))
+        self.u1u2 = np.zeros((max_struc,))
+        absu1u2   = np.abs(np.multiply(self.field_1, self.field_2))
+        u1u2tot   = np.sum(absu1u2)
+        for nn in np.arange(max_struc-1):
+            mask = self.mat_segment == nn+1
+            self.u1u2[nn] = np.sum(absu1u2[mask]) / u1u2tot
+
+    def v2_structure_k123(self):
+        max_struc = int(np.max(self.mat_segment))
+        self.k123 = np.zeros((max_struc,))
+        k123      = np.sqrt(self.field_1**2 + self.field_2**2 + self.field_3**2)
+        k123_tot  = np.sum(k123)
+        for nn in np.arange(max_struc-1):
+            mask = self.mat_segment == nn+1
+            self.k123[nn] = np.sum(k123[mask]) / k123_tot
+
+    def structure_u1u2(self):
+        max_struc = int(np.max(self.mat_segment))
+        self.u1u2 = np.zeros((max_struc,))
+        absu1u2   = np.abs(np.multiply(self.field_1, self.field_2))
+        u1u2tot   = np.sum(absu1u2)
+        flat_seg = self.mat_segment.ravel().astype(int)
+        flat_val  = absu1u2.ravel()
+        result    = np.bincount(flat_seg, weights=flat_val, minlength=max_struc+1)
+        self.u1u2 = result[1:max_struc+1] / u1u2tot
+
+    def structure_k123(self):
+        max_struc = int(np.max(self.mat_segment))
+        self.k123 = np.zeros((max_struc,))
+        k123      = np.sqrt(self.field_1**2 + self.field_2**2 + self.field_3**2)
+        k123_tot  = np.sum(k123)
+        flat_seg = self.mat_segment.ravel().astype(int)
+        flat_val  = k123.ravel()
+        result    = np.bincount(flat_seg, weights=flat_val, minlength=max_struc+1)
+        self.k123 = result[1:max_struc+1] / k123_tot

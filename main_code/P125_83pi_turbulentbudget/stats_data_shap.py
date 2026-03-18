@@ -41,6 +41,6 @@ file_trj = "Re180.prof.txt"
 #     - Hmax : maximum percolation index
 #     - Hnum : number of percolation indices
 # ----------------------------------------------------------------------------------------------------------------------
-Hmin = 0.5
-Hmax = 5
-Hnum = 5
+Hmin = 1
+Hmax = 10
+Hnum = 10

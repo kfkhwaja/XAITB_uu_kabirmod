@@ -24,7 +24,8 @@ For more information about the tangential Reynolds stress structures:
 # - folders    : file containing the folder and file structures
 # - st_data    : file containing the data of the statistics
 # -----------------------------------------------------------------------------------------------------------------------
-folder_def  = "d20240703_definitions"
+#folder_def  = "d20240703_definitions"
+folder_def  = "P125_83pi_turbulentbudget"
 chd_str     = "channel_data"
 folders_str = "folders"
 st_data_str = "stats_data_shap"
@@ -83,7 +84,7 @@ exec("from "+folder_def+" import "+tr_data_str+" as tr_data")
 # -----------------------------------------------------------------------------------------------------------------------
 index_ini   = st_data.field_ini
 index_fin   = st_data.field_fin
-index_delta = st_data.field_delta*5
+index_delta = st_data.field_delta
 Hperc        = 1.61
 uvw_folder   = folders.uvw_folder
 uvw_file     = folders.uvw_file
@@ -113,7 +114,7 @@ SHAPrms_file = folders.SHAPrms_file
 # -----------------------------------------------------------------------------------------------------------------------
 # Create the data of the structure and define the indices to generate the structures
 # -----------------------------------------------------------------------------------------------------------------------
-data_struc = {"uvw_folder":uvw_folder,"uvw_file":uvw_file,"Hperc":Hperc,"index":0,"dx":dx,"dy":dx,"dz":dz,
+data_struc = {"uvw_folder":uvw_folder,"uvw_file":uvw_file,"Hperc":Hperc,"index":0,"dx":dx,"dy":dy,"dz":dz,
               "L_x":L_x,"L_y":L_y,"L_z":L_z,"rey":rey,"utau":utau,"padding":padding,"data_folder":data_folder,
               "umean_file":umean_file,"urms_file":urms_file,"sym_quad":sym_quad,"filvol":filvol,
               "shap_folder":shap_folder,"shap_file":shap_file,"folder":SHAPq_folder,"file":SHAPq_file,"padding":padding,
