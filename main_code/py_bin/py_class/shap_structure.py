@@ -676,7 +676,21 @@ class shap_structure():
         file_write.create_dataset('k_ktot',data=kk)
         file_write.close()
           
-    def add_SHAP(self,data_in={"nsamples":1}):
+
+    def add_SHAP(self, data_in={"nsamples":1}):
+        nsamples = int(data_in["nsamples"])
+    
+        shap_norm = np.sqrt(self.field_u**2 + self.field_v**2 + self.field_w**2)
+        max_struc = int(np.max(self.structures.mat_segment))
+        self.shap = np.zeros((max_struc,))
+    
+        flat_seg  = self.structures.mat_segment.ravel().astype(int)
+        flat_val  = shap_norm.ravel()
+        result    = np.bincount(flat_seg, weights=flat_val, minlength=max_struc+1)
+        self.shap = result[1:max_struc+1]
+
+
+    def OLD_add_SHAP(self,data_in={"nsamples":1}):
         """
         .................................................................................................................
         # add_SHAP

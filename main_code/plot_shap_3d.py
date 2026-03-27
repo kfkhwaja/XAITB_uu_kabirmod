@@ -49,7 +49,8 @@ padtext_z   = 7
 # - folders    : file containing the folder and file structures
 # - st_data    : file containing the data of the statistics
 # -----------------------------------------------------------------------------------------------------------------------
-folder_def  = "d20240703_definitions"
+#folder_def  = "d20240703_definitions"
+folder_def = "P125_83pi_turbulentbudget"
 chd_str     = "channel_data"
 folders_str = "folders"
 st_data_str = "stats_data"
@@ -107,8 +108,8 @@ exec("from "+folder_def+" import "+tr_data_str+" as tr_data")
 #     - nsamples     : number of samples of the shap calculation
 #     - SHAPrms_file : file of the rms of the shap
 # -----------------------------------------------------------------------------------------------------------------------
-index        = 20001
-Hperc        = 1.18
+index        = 10001
+Hperc        = 1.61
 uvw_folder   = folders.uvw_folder
 uvw_file     = folders.uvw_file
 umean_file   = folders.umean_file

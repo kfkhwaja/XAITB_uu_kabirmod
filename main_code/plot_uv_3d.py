@@ -49,7 +49,8 @@ padtext_z   = 7
 # - folders    : file containing the folder and file structures
 # - st_data    : file containing the data of the statistics
 # -----------------------------------------------------------------------------------------------------------------------
-folder_def  = "d20240703_definitions"
+#folder_def  = "d20240703_definitions"
+folder_def = "P125_83pi_turbulentbudget"
 chd_str     = "channel_data"
 folders_str = "folders"
 st_data_str = "stats_data"
@@ -106,8 +107,8 @@ exec("from "+folder_def+" import "+tr_data_str+" as tr_data")
 #     - padding     : padding of the field
 #     - data_type   : type of data used by the model
 # -----------------------------------------------------------------------------------------------------------------------
-index       = 20001
-Hperc       = 1.41
+index       = 10000
+Hperc       = 1.61
 uvw_folder  = folders.uvw_folder
 uvw_file    = folders.uvw_file
 umean_file  = folders.umean_file
