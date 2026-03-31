@@ -64,6 +64,8 @@ from py_bin.py_class.uv_structure import uv_structure
 import os
 from py_bin.py_plots.plotstruc3d import plotstruc3d, plotstruc3d_separe
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 
 # -----------------------------------------------------------------------------------------------------------------------
 # Unlock the h5 files for avoiding problems in some clusters
