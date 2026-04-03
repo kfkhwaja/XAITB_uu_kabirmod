@@ -79,13 +79,11 @@ ymin        = 0
 ymax        = np.pi
 xmin        = 0
 xmax        = 2*np.pi
-errmax      = 0.003
+errmax      = 0.1
 errmin      = 0
-b_velo_sim  = "$TB_s$"
-b_velo_pred = "$TB_p$"
-b_velo_err  = "$\epsilon_{TB}$"
-vmax        = 0.005
-vmin        = -0.005
+b_velo_sim  = "$u_s^+$"
+b_velo_pred = "$u_p^+$"
+b_velo_err  = "$\epsilon_u$"
 
 # -----------------------------------------------------------------------------------------------------------------------
 # Import packages
@@ -291,20 +289,11 @@ os.environ['HDF5_USE_FILE_LOCKING'] = 'FALSE'
 # -----------------------------------------------------------------------------------------------------------------------
 # Create the plot
 # -----------------------------------------------------------------------------------------------------------------------
-#plot_format_data = {"plot_folder":plot_folder,"xlabel":xlabel,"ylabel":ylabel,"fontsize":fontsize,
-#                    "figsize_x":figsize_x,"figsize_y":figsize_y,"colormap":colormap,"colornum":colornum,
-#                    "fig_name":fig_name,"dpi":dpi,"folder_def":folder_def,"tr_data_str":tr_data_str,
-#                    "chd_str":chd_str,"folders_str":folders_str,"index_ii":index_ii,"Unet":Unet,"flowfield":flowfield,
-#                    "index_y":index_y,"xmin":xmin*flowfield.rey,"xmax":xmax*flowfield.rey,"ymin":ymin*flowfield.rey,
-#                    "ymax":ymax*flowfield.rey,"errmax":errmax,"errmin":errmin,"b_velo_sim":b_velo_sim,
-#                    "b_velo_pred":b_velo_pred,"b_velo_err":b_velo_err}
-#plotprediction(data_in=plot_format_data)
 plot_format_data = {"plot_folder":plot_folder,"xlabel":xlabel,"ylabel":ylabel,"fontsize":fontsize,
-                    "figsize_x":figsize_x,"figsize_y":figsize_y,"colormap":colormap,"colornum":colornum,
-                    "fig_name":fig_name,"dpi":dpi,"folder_def":folder_def,"tr_data_str":tr_data_str,
-                    "chd_str":chd_str,"folders_str":folders_str,"index_ii":index_ii,"Unet":Unet,"flowfield":flowfield,
-                    "index_y":index_y,"xmin":xmin*flowfield.rey,"xmax":xmax*flowfield.rey,"ymin":ymin*flowfield.rey,
-                    "ymax":ymax*flowfield.rey,"errmax":errmax,"errmin":errmin,
-                    "vmax":vmax,"vmin":vmin,
-                    "b_velo_sim":b_velo_sim,"b_velo_pred":b_velo_pred,"b_velo_err":b_velo_err}
+                   "figsize_x":figsize_x,"figsize_y":figsize_y,"colormap":colormap,"colornum":colornum,
+                   "fig_name":fig_name,"dpi":dpi,"folder_def":folder_def,"tr_data_str":tr_data_str,
+                   "chd_str":chd_str,"folders_str":folders_str,"index_ii":index_ii,"Unet":Unet,"flowfield":flowfield,
+                   "index_y":index_y,"xmin":xmin*flowfield.rey,"xmax":xmax*flowfield.rey,"ymin":ymin*flowfield.rey,
+                   "ymax":ymax*flowfield.rey,"errmax":errmax,"errmin":errmin,"b_velo_sim":b_velo_sim,
+                   "b_velo_pred":b_velo_pred,"b_velo_err":b_velo_err}
 plotprediction(data_in=plot_format_data)

@@ -109,20 +109,18 @@ def plotprediction(data_in={"plot_folder":"plots","xlabel":"Epoch","ylabel":"Los
     b_velo_pred = str(data_in["b_velo_pred"])
     b_velo_err  = str(data_in["b_velo_err"])
     
-    #data_norm   = read_norm(data_in={"folder":Unet.data_folder,"file":Unet.umax_file})
-    #umax        = data_norm["uumax"]
-    #umin        = data_norm["uumin"]
-    umax        = data_in.get("vmax", 0.05)
-    umin        = data_in.get("vmin", -0.05)
+    data_norm   = read_norm(data_in={"folder":Unet.data_folder,"file":Unet.umax_file})
+    umax        = data_norm["uumax"]
+    umin        = data_norm["uumin"]
     erru        = np.sum(np.multiply(data_error["err_u"],flowfield.vol_plus))/np.sum(flowfield.vol_plus)
     errv        = np.sum(np.multiply(data_error["err_v"],flowfield.vol_plus))/np.sum(flowfield.vol_plus)
     errw        = np.sum(np.multiply(data_error["err_w"],flowfield.vol_plus))/np.sum(flowfield.vol_plus)
  
     xx,zz       = np.meshgrid(flowfield.xplus,flowfield.zplus)
-    #yyplus      = "y^+ = "+'{0:.2f}'.format(flowfield.yplus[index_y])+\
-    #    ", $\epsilon_u$: "+'{0:.2f}'.format(erru*100)+'%'+", $\epsilon_v$: "+'{0:.2f}'.format(errv*100)+'%'+\
-    #        ", $\epsilon_w$: "+'{0:.2f}'.format(errw*100)+'%'
-    yyplus      = "y^+ = "+'{0:.2f}'.format(flowfield.yplus[index_y]) + ", $\epsilon_{TB}$: "+'{0:.2f}'.format(erru*100)+'%'       
+    yyplus      = "y^+ = "+'{0:.2f}'.format(flowfield.yplus[index_y])+\
+        ", $\epsilon_u$: "+'{0:.2f}'.format(erru*100)+'%'+", $\epsilon_v$: "+'{0:.2f}'.format(errv*100)+'%'+\
+            ", $\epsilon_w$: "+'{0:.2f}'.format(errw*100)+'%'
+            
     fig_name    = fig_name+"_field"+str(index_ii)+"_y"+'{0:.0f}'.format(flowfield.yplus[index_y])
     # -------------------------------------------------------------------------------------------------------------------
     # Create the plot
