@@ -953,10 +953,19 @@ class deep_model():
         # --------------------------------------------------------------------------------------------------------------
         # Calculate the predicted field
         # --------------------------------------------------------------------------------------------------------------
+        # field_pred = self.model.predict(field_in)
+        # del field_in
+        # data_out   = dim_velocity(data_in={"unorm":field_pred[0,:,:,:,0],"vnorm":field_pred[0,:,:,:,1],
+        #                                    "wnorm":field_pred[0,:,:,:,2],"folder_data":self.data_folder,
+        #                                    "unorm_file":self.unorm_file,"data_type":self.data_type,
+        #                                    "mean_norm":self.mean_norm})
+        # return data_out
         field_pred = self.model.predict(field_in)
         del field_in
-        data_out   = dim_velocity(data_in={"unorm":field_pred[0,:,:,:,0],"vnorm":field_pred[0,:,:,:,1],
-                                           "wnorm":field_pred[0,:,:,:,2],"folder_data":self.data_folder,
+        
+        zeros = np.zeros_like(field_pred[0,:,:,:,0])
+        data_out   = dim_velocity(data_in={"unorm":field_pred[0,:,:,:,0],"vnorm":zeros,
+                                           "wnorm":zeros,"folder_data":self.data_folder,
                                            "unorm_file":self.unorm_file,"data_type":self.data_type,
                                            "mean_norm":self.mean_norm})
         return data_out
