@@ -26,7 +26,7 @@ In addition the following variables need to be set:
 # - folder_def : folder containing the files with the definitions required in the problem
 # - folders    : file containing the folder and file structures
 # -----------------------------------------------------------------------------------------------------------------------
-folder_def  = "d20240603_definitions"
+folder_def  = "P125_83pi_turbulentbudget"
 folders_str = "folders"
 
 # -----------------------------------------------------------------------------------------------------------------------
