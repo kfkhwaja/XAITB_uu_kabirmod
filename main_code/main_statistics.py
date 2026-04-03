@@ -112,28 +112,28 @@ Data_flow={"folder":folder_uvw,"file":file_uvw,"down_x":dx,"down_y":dy,"down_z":
 flow = flow_field(data_in=Data_flow)
 flow.shape_tensor()
 
-# # -----------------------------------------------------------------------------------------------------------------------
-# # Calculate the mean values of the velocity
-# # -----------------------------------------------------------------------------------------------------------------------
-# Data_umean={"field_ini":field_ini,"field_fin":field_fin,"folder":folder_uvw,"file":file_uvw,"save_file":save_file,
-#             "umean_file":umean_file,"data_folder":data_folder,"shpx":flow.shpx,"shpy":flow.shpy,"shpz":flow.shpz}
-# calc_Umean(data_in=Data_umean)
+# -----------------------------------------------------------------------------------------------------------------------
+# Calculate the mean values of the velocity
+# -----------------------------------------------------------------------------------------------------------------------
+Data_umean={"field_ini":field_ini,"field_fin":field_fin,"folder":folder_uvw,"file":file_uvw,"save_file":save_file,
+            "umean_file":umean_file,"data_folder":data_folder,"shpx":flow.shpx,"shpy":flow.shpy,"shpz":flow.shpz}
+calc_Umean(data_in=Data_umean)
 
-# # -----------------------------------------------------------------------------------------------------------------------
-# # Calculate the RMS of the velocity
-# # -----------------------------------------------------------------------------------------------------------------------
-# data_rms={"field_ini":field_ini,"field_fin":field_fin,"umean_file":umean_file,"data_folder":data_folder,
-#           "file":file_uvw,"folder":folder_uvw,"dx":dx,"dy":dy,"dz":dz,"shpx":flow.shpx,"shpy":flow.shpy,
-#           "shpz":flow.shpz,"save_file":save_file,"urms_file":urms_file}
-# calc_rms(data_in=data_rms)
+# -----------------------------------------------------------------------------------------------------------------------
+# Calculate the RMS of the velocity
+# -----------------------------------------------------------------------------------------------------------------------
+data_rms={"field_ini":field_ini,"field_fin":field_fin,"umean_file":umean_file,"data_folder":data_folder,
+          "file":file_uvw,"folder":folder_uvw,"dx":dx,"dy":dy,"dz":dz,"shpx":flow.shpx,"shpy":flow.shpy,
+          "shpz":flow.shpz,"save_file":save_file,"urms_file":urms_file}
+calc_rms(data_in=data_rms)
 
-# # -----------------------------------------------------------------------------------------------------------------------
-# # Calculate the normalization values for the velocity dataset
-# # -----------------------------------------------------------------------------------------------------------------------
-# data_norm={"field_ini":field_ini,"field_fin":field_fin,"data_folder":data_folder,"umean_file":umean_file,
-#             "dx":dx,"dy":dy,"dz":dz,"folder":folder_uvw,"file":file_uvw,"shpx":flow.shpx,"shpy":flow.shpy,
-#             "shpz":flow.shpz,"save_file":save_file,"unorm_file":unorm_file}
-# calc_norm(data_in=data_norm)
+# -----------------------------------------------------------------------------------------------------------------------
+# Calculate the normalization values for the velocity dataset
+# -----------------------------------------------------------------------------------------------------------------------
+data_norm={"field_ini":field_ini,"field_fin":field_fin,"data_folder":data_folder,"umean_file":umean_file,
+            "dx":dx,"dy":dy,"dz":dz,"folder":folder_uvw,"file":file_uvw,"shpx":flow.shpx,"shpy":flow.shpy,
+            "shpz":flow.shpz,"save_file":save_file,"unorm_file":unorm_file}
+calc_norm(data_in=data_norm)
 
 
 # -----------------------------------------------------------------------------------------------------------------------
