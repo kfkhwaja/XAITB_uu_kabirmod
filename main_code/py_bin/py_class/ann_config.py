@@ -17,7 +17,6 @@ File to define the deep learning model. The file contains a class for the deep l
 import os
 import numpy as np
 import sys
-import gc
 
 # -----------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------
@@ -210,13 +209,7 @@ class deep_model():
         self.error_file      = str(data_in["error_file"])       
         self.umax_file       = str(data_in["umax_file"])
         self.urmspred_file   = str(data_in["urmspred_file"])
-        if "tb_folder" in data_in:
-        	self.tb_folder    = data_in["tb_folder"]
-        	self.tb_file      = data_in["tb_file"]
-        	self.tb_norm_file = data_in["tb_norm_file"]
-        	file_tb_norm      = self.data_folder + '/' + self.tb_norm_file
-        	self.tb_norm      = np.loadtxt(file_tb_norm)
-
+        
         # ---------------------------------------------------------------------------------------------------------------
         # Calculate the shape of the tensors in the different directions this is useful in the case
         # of downsampling the fields
@@ -525,14 +518,10 @@ class deep_model():
         # Create the model
         # --------------------------------------------------------------------------------------------------------------
         if self.ngpu > 0:
-            mixed_precision.set_global_policy('float32')
+            mixed_precision.set_global_policy('mixed_float16')
             
         if self.ngpu == 0:
-            # model0     = tf.keras.models.load_model(self.model_folder+'/'+self.model_read)
-            model0 = tf.keras.models.load_model(
-                self.model_folder + '/' + self.model_read,
-                compile=False
-            )
+            model0     = tf.keras.models.load_model(self.model_folder+'/'+self.model_read)
             weight0    = model0.get_weights()
             self.model_base()	
             optimizer  = RMSprop(learning_rate=self.learat,momentum=self.optmom) 																 
@@ -964,40 +953,13 @@ class deep_model():
         # --------------------------------------------------------------------------------------------------------------
         # Calculate the predicted field
         # --------------------------------------------------------------------------------------------------------------
-        #field_pred = self.model.predict(field_in)
-        #del field_in
-        #data_out   = dim_velocity(data_in={"unorm":field_pred[0,:,:,:,0],"vnorm":field_pred[0,:,:,:,1],
-        #                                   "wnorm":field_pred[0,:,:,:,2],"folder_data":self.data_folder,
-        #                                   "unorm_file":self.unorm_file,"data_type":self.data_type,
-        #                                   "mean_norm":self.mean_norm})
-        	
-        #zeros = np.zeros_like(field_pred[0,:,:,:,0])
-        #data_out   = dim_velocity(data_in={"unorm":field_pred[0,:,:,:,0],"vnorm":zeros,
-        #                           "wnorm":zeros,"folder_data":self.data_folder,
-        #                           "unorm_file":self.unorm_file,"data_type":self.data_type,
-        #                           "mean_norm":self.mean_norm})
-
-        #zeros = np.zeros_like(field_pred[0,:,:,:,0])
-        #data_out   = dim_velocity(data_in={"unorm":field_pred[0,:,:,:,0],"vnorm":zeros,
-        #                           "wnorm":zeros,"folder_data":self.data_folder,
-        #                           "unorm_file":self.tb_norm_file,"data_type":self.data_type,
-        #                           "mean_norm":self.mean_norm})
-
         field_pred = self.model.predict(field_in)
         del field_in
-        
-        pred_tb_norm = field_pred[0,:,:,:,0]
-        
-        if self.mean_norm:
-            pred_tb_dim = pred_tb_norm * self.tb_norm[1] + self.tb_norm[0]
-        else:
-            pred_tb_dim = pred_tb_norm * (self.tb_norm[0] - self.tb_norm[1]) + self.tb_norm[1]
-            
-        zeros      = np.zeros_like(pred_tb_dim)
-        data_out   = {"uu": pred_tb_dim, "vv": zeros, "ww": zeros}
-
+        data_out   = dim_velocity(data_in={"unorm":field_pred[0,:,:,:,0],"vnorm":field_pred[0,:,:,:,1],
+                                           "wnorm":field_pred[0,:,:,:,2],"folder_data":self.data_folder,
+                                           "unorm_file":self.unorm_file,"data_type":self.data_type,
+                                           "mean_norm":self.mean_norm})
         return data_out
-
 
     def field_error(self,data_in={"index_ii":1000}):
         """
@@ -1026,8 +988,7 @@ class deep_model():
         # --------------------------------------------------------------------------------------------------------------
         from py_bin.py_functions.read_velocity import read_velocity
         from py_bin.py_functions.normalization import read_norm
-
-
+        
         # --------------------------------------------------------------------------------------------------------------
         # Read the data
         # --------------------------------------------------------------------------------------------------------------
@@ -1037,98 +998,52 @@ class deep_model():
         # Predict the field
         # ----------------------------------------------------------------------------------------------------------
         dim_pred                = self.pred_field(data_in={"index_ii":index_ii})
-        print('predicted field')
-        # field_out_pred          = np.zeros((self.shpy,self.shpz,self.shpx,3),dtype=self.data_type)
-        # field_out_pred[:,:,:,0] = dim_pred["uu"]
-        # field_out_pred[:,:,:,1] = dim_pred["vv"]
-        # field_out_pred[:,:,:,2] = dim_pred["ww"]
-        field_out_pred = np.stack(
-            (dim_pred["uu"], dim_pred["vv"], dim_pred["ww"]),
-            axis=-1
-        )
-
+        field_out_pred          = np.zeros((self.shpy,self.shpz,self.shpx,3),dtype=self.data_type)
+        field_out_pred[:,:,:,0] = dim_pred["uu"]
+        field_out_pred[:,:,:,1] = dim_pred["vv"]
+        field_out_pred[:,:,:,2] = dim_pred["ww"]
+        
         # --------------------------------------------------------------------------------------------------------------
         # Read the output file
         # --------------------------------------------------------------------------------------------------------------
-        #field_out          = np.zeros((self.shpy,self.shpz,self.shpx,3),dtype=self.data_type)
-        #data_velocity_out  = {"folder":self.uvw_folder,"file":self.uvw_file,"index":index_ii+self.delta_pred,
-        #                      "dx":self.dx,"dy":self.dy,"dz":self.dz,"shpx":self.shpx,"shpy":self.shpy,
-        #                      "shpz":self.shpz,"padding":0,"data_folder":self.data_folder,
-        #                      "umean_file":self.umean_file}
-        #velocity_out       = read_velocity(data_velocity_out)
-        #field_out[:,:,:,0] = velocity_out['uu']
-        #field_out[:,:,:,1] = velocity_out['vv']
-        #field_out[:,:,:,2] = velocity_out['ww']
-
-        #field_out          = np.zeros((self.shpy,self.shpz,self.shpx,3),dtype=self.data_type)
-        #data_velocity_out  = {"folder":self.tb_folder,"file":self.tb_file,"index":index_ii+self.delta_pred,
-        #                      "dx":self.dx,"dy":self.dy,"dz":self.dz,"shpx":self.shpx,"shpy":self.shpy,
-        #                      "shpz":self.shpz,"padding":0,"data_folder":self.data_folder,
-        #                      "umean_file":self.umean_file}
-        #velocity_out       = read_velocity(data_velocity_out)
-        #field_out[:,:,:,0] = velocity_out['uu']
-        #field_out[:,:,:,1] = velocity_out['vv']
-        #field_out[:,:,:,2] = velocity_out['ww']
-
-        import h5py
         field_out          = np.zeros((self.shpy,self.shpz,self.shpx,3),dtype=self.data_type)
-        file_ii = self.tb_folder + '/' + self.tb_file.replace("$INDEX$", str(index_ii + self.delta_pred))
-
-        with h5py.File(file_ii, 'r') as f:
-            tb_data = np.array(f['prod'])[::self.dy, ::self.dz, ::self.dx]
-            
-        field_out[:,:,:,0] = tb_data
-        field_out[:,:,:,1] = 0.0
-        field_out[:,:,:,2] = 0.0
-
-        #del data_velocity_out
+        data_velocity_out  = {"folder":self.uvw_folder,"file":self.uvw_file,"index":index_ii+self.delta_pred,
+                              "dx":self.dx,"dy":self.dy,"dz":self.dz,"shpx":self.shpx,"shpy":self.shpy,
+                              "shpz":self.shpz,"padding":0,"data_folder":self.data_folder,
+                              "umean_file":self.umean_file}
+        velocity_out       = read_velocity(data_velocity_out)
+        field_out[:,:,:,0] = velocity_out['uu']
+        field_out[:,:,:,1] = velocity_out['vv']
+        field_out[:,:,:,2] = velocity_out['ww']
+        del data_velocity_out
+        
         # --------------------------------------------------------------------------------------------------------------
         # Calculate the error
         # --------------------------------------------------------------------------------------------------------------
-        #data_norm = read_norm(data_in={"folder":self.data_folder,"file":self.umax_file})
-        #uref      = np.max([abs(data_norm["uumax"]),abs(data_norm["uumin"])])
-        #vref      = np.max([abs(data_norm["vvmax"]),abs(data_norm["vvmin"])])
-        #wref      = np.max([abs(data_norm["wwmax"]),abs(data_norm["wwmin"])])
-        #errorfun  = abs(field_out-field_out_pred)
-
-        #del field_out_pred
-        #gc.collect()
+        data_norm = read_norm(data_in={"folder":self.data_folder,"file":self.umax_file})
+        uref      = np.max([abs(data_norm["uumax"]),abs(data_norm["uumin"])])
+        vref      = np.max([abs(data_norm["vvmax"]),abs(data_norm["vvmin"])])
+        wref      = np.max([abs(data_norm["wwmax"]),abs(data_norm["wwmin"])])
+        errorfun  = abs(field_out-field_out_pred)
         
-        tb_ref    = np.max([abs(self.tb_norm[0]), abs(self.tb_norm[1])])
-        errorfun  = abs(field_out - field_out_pred)
-
-        del field_out_pred
-        gc.collect()
         # --------------------------------------------------------------------------------------------------------------
         # Generate the output
         # --------------------------------------------------------------------------------------------------------------
-        #data_out          = {}
-        #data_out["err_u"] = errorfun[:,:,:,0]/uref
-        #data_out["err_v"] = errorfun[:,:,:,1]/vref
-        #data_out["err_w"] = errorfun[:,:,:,2]/wref
         data_out          = {}
-        data_out["err_u"] = errorfun[:,:,:,0] / tb_ref
-        data_out["err_v"] = errorfun[:,:,:,1] / tb_ref  # Will be zero
-        data_out["err_w"] = errorfun[:,:,:,2] / tb_ref  # Will be zero
+        data_out["err_u"] = errorfun[:,:,:,0]/uref
+        data_out["err_v"] = errorfun[:,:,:,1]/vref
+        data_out["err_w"] = errorfun[:,:,:,2]/wref
         del errorfun
         data_out["pre_u"] = dim_pred["uu"]
         data_out["pre_v"] = dim_pred["vv"]
         data_out["pre_w"] = dim_pred["ww"]
         del dim_pred
-        #data_out["sim_u"] = velocity_out["uu"]
-        #data_out["sim_v"] = velocity_out["vv"]
-        #data_out["sim_w"] = velocity_out["ww"]
-        #del velocity_out
-        #del field_out
-        #gc.collect()
-        #return data_out
-        data_out["sim_u"] = field_out[:,:,:,0]
-        data_out["sim_v"] = field_out[:,:,:,1]
-        data_out["sim_w"] = field_out[:,:,:,2]
-        del field_out
-        gc.collect()
+        data_out["sim_u"] = velocity_out["uu"]
+        data_out["sim_v"] = velocity_out["vv"]
+        data_out["sim_w"] = velocity_out["ww"]
+        del velocity_out
         return data_out
-                
+                         
     def pred_error(self):
         """
         ................................................................................................................
@@ -1182,9 +1097,6 @@ class deep_model():
             print("Error v:"+str(errv/errvol*100)+"%",flush=True)
             print("Error w:"+str(errw/errvol*100)+"%",flush=True)
             del erru,errv,errw,errvol,data_error
-            import tensorflow as tf
-            tf.keras.backend.clear_session()
-            gc.collect()
             
         error_u /= n_error
         error_v /= n_error
