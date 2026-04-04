@@ -956,10 +956,17 @@ class deep_model():
         field_pred = self.model.predict(field_in)
         del field_in
         
-        data_out   = dim_velocity(data_in={
-            "unorm": field_pred[0,:,:,:,0],
-            "vnorm": field_pred[0,:,:,:,1],
-            "wnorm": field_pred[0,:,:,:,2],
+        # Strip the padding from the spatial dimensions (z and x axes)
+        field_pred_stripped = field_pred[0,
+                                        :,
+                                        self.padding : self.shpz + self.padding,
+                                        self.padding : self.shpx + self.padding,
+                                        :]
+
+        data_out = dim_velocity(data_in={
+            "unorm": field_pred_stripped[:,:,:,0],
+            "vnorm": field_pred_stripped[:,:,:,1],
+            "wnorm": field_pred_stripped[:,:,:,2],
             "folder_data": self.data_folder,
             "unorm_file": self.unorm_file,
             "data_type": self.data_type,
