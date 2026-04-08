@@ -242,15 +242,28 @@ Unet.train_model()
 print("Training finished. Forcing manual weight save...")
 Unet.model.save('/scratch/rvinuesa_root/rvinuesa/khwaja/test_data_kabir/strat/models/trained_model_prod_0001.h5')
 
-# Sanity Check: Test the model immediately while it is still in RAM
+# ----------------------------------------------------------------------------------------------------------------------
+# Safe Diagnostic: Test full-field alignment 
+# ----------------------------------------------------------------------------------------------------------------------
 import numpy as np
 
+print("====== DIAGNOSTIC CHECK ======")
 try:
-    # Pull one single batch of (input, target) from the training dataset iterator
-    for data_batch in Unet.dataset_train.take(1):
-        # data_batch[0] is the input (x), data_batch[1] is the target (y)
-        test_pred = Unet.model.predict(data_batch[0])
-        print("SANITY CHECK - RAM Model STD:", np.std(test_pred))
+    # Create a dummy array matching the EXACT padded shape used in calc_pred_error.py
+    # (Batch=1, Y=201, Z=318, X=414, Channels=3)
+    dummy_input = np.random.randn(1, 201, 318, 414, 3).astype(np.float32)
+    
+    # Predict on the full field while the network is still in RAM
+    test_pred = Unet.model.predict(dummy_input)
+    
+    print("Dummy Input STD: ", np.std(dummy_input))
+    print("Full-Field Output STD: ", np.std(test_pred))
+    
+    if np.std(test_pred) < 0.01:
+        print("\nWARNING: Output collapsed to noise! The U-Net geometry is scrambling full-field inputs.")
+    else:
+        print("\nSUCCESS: The model maintains variance on full-field inputs.")
+
 except Exception as e:
-    print("Could not run RAM sanity check due to data format, but weights were successfully saved.")
-    print("Error:", e)
+    print("Diagnostic failed:", e)
+print("==============================")
