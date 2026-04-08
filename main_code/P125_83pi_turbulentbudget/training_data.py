@@ -44,7 +44,7 @@ ngpu  = None
 #     - optmom      : Momentum of the RMSprop
 #     - batch_size  : Batch size
 # ----------------------------------------------------------------------------------------------------------------------
-learat      = 5e-5
+learat      = 1e-5
 optmom      = 0.9
 batch_size  = 1
 
