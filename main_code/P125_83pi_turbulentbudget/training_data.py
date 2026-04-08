@@ -105,11 +105,11 @@ delta_pred  = 1
 #     - check         : Flag for checking the data
 #     - flag_tfrecord : Flag to read the tfrecord file
 # ----------------------------------------------------------------------------------------------------------------------
-prep_data     = False
+prep_data     = True
 flag_central  = False
 data_type     = "float32"
 multi_worker  = False
-mean_norm     = True
+mean_norm     = False
 check         = False
 flag_tfrecord = True
 save_fields   = True
