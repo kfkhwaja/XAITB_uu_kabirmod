@@ -240,7 +240,7 @@ Unet.train_model()
 
 # Force save the converged weights to disk, bypassing callbacks
 print("Training finished. Forcing manual weight save...")
-Unet.model.save_weights('/scratch/rvinuesa_root/rvinuesa/khwaja/test_data_kabir/strat/models/trained_model_prod_0001.h5')
+Unet.model.save('/scratch/rvinuesa_root/rvinuesa/khwaja/test_data_kabir/strat/models/trained_model_prod_0001.h5')
 
 # Sanity Check: Test the model immediately while it is still in RAM
 import numpy as np
