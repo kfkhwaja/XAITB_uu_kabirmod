@@ -204,4 +204,6 @@ Unet.define_model(Training_data)
 # ----------------------------------------------------------------------------------------------------------------------
 # Train the model
 # ----------------------------------------------------------------------------------------------------------------------
+print(f"FORCING WEIGHT LOAD FROM: {model_folder}{model_read}")
+Unet.model.load_weights(model_folder + model_read)
 Unet.pred_error()
