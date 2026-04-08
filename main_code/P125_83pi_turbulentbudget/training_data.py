@@ -61,7 +61,7 @@ batch_size  = 1
 #     - prefetch    : Number of batches to load in memory
 # ----------------------------------------------------------------------------------------------------------------------
 field_ini   = 10000
-field_fin   = 10002
+field_fin   = 10100
 field_delta = 1
 field_mem   = 5
 test_size   = 0.2
@@ -74,7 +74,7 @@ prefetch    = -1
 #     - epoch_max   : Number of maximum epochs of the training
 # ----------------------------------------------------------------------------------------------------------------------
 epoch_save  = 1
-epoch_max   = 200
+epoch_max   = 5000
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Configuration of the model. Parameters rquired for the model
