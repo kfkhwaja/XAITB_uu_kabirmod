@@ -1010,6 +1010,13 @@ class deep_model():
         field_out_pred[:,:,:,0] = dim_pred["uu"]
         field_out_pred[:,:,:,1] = dim_pred["vv"]
         field_out_pred[:,:,:,2] = dim_pred["ww"]
+
+        # --- DEBUG ---
+        for comp, key in enumerate(["uu","vv","ww"]):
+            arr = dim_pred[key]
+            print(f"pred  {key} | mean={np.mean(arr):.6f}  std={np.std(arr):.6f}  "
+                f"min={np.min(arr):.6f}  max={np.max(arr):.6f}", flush=True)
+        # -------------
         
         # --------------------------------------------------------------------------------------------------------------
         # Read the output file
@@ -1023,6 +1030,13 @@ class deep_model():
         field_out[:,:,:,0] = velocity_out['uu']
         field_out[:,:,:,1] = velocity_out['vv']
         field_out[:,:,:,2] = velocity_out['ww']
+
+        # --- DEBUG ---
+        for key in ["uu","vv","ww"]:
+            arr = velocity_out[key]
+            print(f"truth {key} | mean={np.mean(arr):.6f}  std={np.std(arr):.6f}  "
+                f"min={np.min(arr):.6f}  max={np.max(arr):.6f}", flush=True)
+        # -------------
         del data_velocity_out
         
         # --------------------------------------------------------------------------------------------------------------
