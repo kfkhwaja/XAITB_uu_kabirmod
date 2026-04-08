@@ -73,11 +73,11 @@ def block(data_in={"input":[],"nfil":16,"stride":1,"activ":"relu","kernel":3,"dt
     # -------------------------------------------------------------------------------------------------------------------
     if flagt:
         xx = Conv3D(nfil, kernel_size=kernel,strides=(stride,stride,stride),padding="same")(xx)
-        xx = BatchNormalization()(xx) 
+        #xx = BatchNormalization()(xx) 
         xx = Activation(activ)(xx)
     else:
         xx = Conv3D(nfil, kernel_size=kernel,strides=(stride,stride,stride),padding="same",dtype=dtype)(xx)
-        xx = BatchNormalization(dtype=dtype)(xx)
+        #xx = BatchNormalization(dtype=dtype)(xx)
         xx = Activation(activ,dtype=dtype)(xx)
     
     # -------------------------------------------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ def invblock(data_in={"input":[],"nfil":16,"stride":1,"activ":"relu","kernel":3}
     # -------------------------------------------------------------------------------------------------------------------
     xx = Conv3DTranspose(nfil, kernel_size=kernel,strides=(stride,stride,stride),padding="valid")(xx)#,
                          # output_padding=outpad)(xx)
-    xx = BatchNormalization()(xx) 
+    #xx = BatchNormalization()(xx) 
     xx = Activation(activ)(xx)
     
     # -------------------------------------------------------------------------------------------------------------------
