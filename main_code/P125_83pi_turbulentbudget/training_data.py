@@ -74,7 +74,7 @@ prefetch    = -1
 #     - epoch_max   : Number of maximum epochs of the training
 # ----------------------------------------------------------------------------------------------------------------------
 epoch_save  = 1
-epoch_max   = 2000
+epoch_max   = 200
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Configuration of the model. Parameters rquired for the model
