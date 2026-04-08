@@ -61,9 +61,9 @@ batch_size  = 8
 #     - prefetch    : Number of batches to load in memory
 # ----------------------------------------------------------------------------------------------------------------------
 field_ini   = 10000
-field_fin   = 10008
+field_fin   = 10001
 field_delta = 1
-field_mem   = 8
+field_mem   = 1
 test_size   = 0.2
 adapt_batch = True
 prefetch    = -1
