@@ -244,5 +244,13 @@ Unet.model.save_weights('/scratch/rvinuesa_root/rvinuesa/khwaja/test_data_kabir/
 
 # Sanity Check: Test the model immediately while it is still in RAM
 import numpy as np
-test_pred = Unet.model.predict(Unet.x_train) # (Adjust variable name if your training data tensor is named differently)
-print("SANITY CHECK - RAM Model STD:", np.std(test_pred))
+
+try:
+    # Pull one single batch of (input, target) from the training dataset iterator
+    for data_batch in Unet.dataset_train.take(1):
+        # data_batch[0] is the input (x), data_batch[1] is the target (y)
+        test_pred = Unet.model.predict(data_batch[0])
+        print("SANITY CHECK - RAM Model STD:", np.std(test_pred))
+except Exception as e:
+    print("Could not run RAM sanity check due to data format, but weights were successfully saved.")
+    print("Error:", e)
