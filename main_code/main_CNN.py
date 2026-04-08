@@ -237,3 +237,12 @@ Unet.define_model(Training_data)
 # Train the model
 # ----------------------------------------------------------------------------------------------------------------------
 Unet.train_model()
+
+# Force save the converged weights to disk, bypassing callbacks
+print("Training finished. Forcing manual weight save...")
+Unet.model.save_weights('/scratch/rvinuesa_root/rvinuesa/khwaja/test_data_kabir/strat/models/trained_model_prod_0001.h5')
+
+# Sanity Check: Test the model immediately while it is still in RAM
+import numpy as np
+test_pred = Unet.model.predict(Unet.x_train) # (Adjust variable name if your training data tensor is named differently)
+print("SANITY CHECK - RAM Model STD:", np.std(test_pred))
